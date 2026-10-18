@@ -887,6 +887,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetwrap').hi
 
 load();render();
 </script>
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://uzygfmpjm kggqftlxrhs.supabase.co'.replace(' ', '');
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6eWdmbXBqbWtnZ3FmdGx4cmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNDczOTQsImV4cCI6MjEwNzkyMzM5NH0.ZdybDhFSwadSzqpjmX5SSUPyzj7hwGTIUvmDs6egEQk';
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+</script>
+
 
 </body>
 </html>
