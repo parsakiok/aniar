@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>انیار</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0b0d0b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: one-column phone app. Sticky header, scrolling card stack, fixed four-tab bar, bottom sheets for forms. */
+:root{
+  --bg:#0b0d0b;
+  --surface:#121612;
+  --surface-2:#181d18;
+  --line:#252c26;
+  --fg:#e8ede7;
+  --muted:#8c968d;
+  --green:#1d5a3f;
+  --green-hi:#2f8a61;
+  --green-deep:#123626;
+  --accent:#74d3a4;
+  --red:#8c2128;
+  --red-deep:#3d1114;
+  --red-fg:#ff9ea4;
+  --font:'Vazirmatn',system-ui,'Noto Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{direction:rtl}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 96px;
+  min-height:100%;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+button,input,textarea{font-family:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 12px;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:40px;height:40px;flex:none}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:0;line-height:1.2}
+.brand p{font-size:12.5px;color:var(--muted)}
+.icon-btn{
+  width:42px;height:42px;flex:none;border-radius:13px;border:1px solid var(--line);background:var(--surface);
+  display:grid;place-items:center;cursor:pointer;color:var(--muted)
+}
+.icon-btn:active{background:var(--surface-2)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.sm{width:36px;height:36px;border-radius:11px}
+
+/* surfaces */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center}
+.row.sb{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-title{font-size:13px;color:var(--muted);font-weight:700;margin-block:6px 0}
+
+/* controls */
+.btn{
+  border:0;border-radius:var(--r);padding:12px 16px;min-height:46px;background:var(--green);color:#eaf6ee;
+  font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s ease,background .15s ease
+}
+.btn:active{transform:scale(.98);background:var(--green-deep)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--fg)}
+.btn.ghost:active{background:var(--surface-2)}
+.btn.danger{background:var(--red-deep);color:var(--red-fg);border:1px solid var(--red)}
+.btn.danger:active{background:#2c0b0d}
+.btn.sm{min-height:40px;padding:8px 14px;font-size:14px}
+.btn.wide{width:100%}
+.btn svg{width:18px;height:18px}
+.btn:focus-visible,.icon-btn:focus-visible,.nav button:focus-visible,.seg button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+input,textarea{
+  width:100%;background:#0e110e;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;min-height:46px;
+}
+textarea{min-height:120px;resize:vertical;font-size:13px;direction:ltr;text-align:left}
+input::placeholder,textarea::placeholder{color:#566058}
+input:focus,textarea:focus{border-color:var(--green-hi);outline:none}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--muted);font-weight:500;min-width:0}
+label.f>input{color:var(--fg)}
+
+.seg{display:flex;background:#0e110e;border:1px solid var(--line);border-radius:14px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:9px 12px;border-radius:11px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px;white-space:nowrap}
+.seg button.on{background:var(--green);color:#eaf6ee}
+.seg.mini{flex:none}
+.seg.mini button{padding:8px 12px}
+
+.stepper{display:flex;direction:ltr;align-items:stretch;gap:6px}
+.stepper input{text-align:center;padding-inline:4px;min-width:0}
+.stepper button{flex:none;width:44px;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;font-size:20px;cursor:pointer;color:var(--fg)}
+.stepper button:active{background:var(--green-deep)}
+
+.chip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--accent);border-color:var(--green)}
+.chip.low{color:var(--red-fg);border-color:var(--red)}
+.chip.empty{background:var(--red-deep);color:var(--red-fg);border-color:var(--red)}
+.chip.buy{color:#e2c98a;border-color:#5b4c22}
+
+/* invoice */
+.line{display:flex;flex-direction:column;gap:10px}
+.line-top{display:flex;gap:8px}
+.line-sum{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--muted)}
+.line-sum b{font-size:17px;color:var(--fg);font-weight:800}
+.line-sum .ld{color:var(--red-fg);font-size:12.5px;margin-inline-start:8px}
+.hint{font-size:12px;color:var(--muted);min-height:0}
+.hint.bad{color:var(--red-fg)}
+.hint:empty{display:none}
+.disc-row{display:flex;gap:10px;align-items:flex-end}
+.disc-row label{flex:1}
+.summary{display:flex;flex-direction:column;gap:8px}
+.summary .r{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
+.summary .r span:last-child{color:var(--fg)}
+.summary .r.neg span:last-child{color:var(--red-fg)}
+.grand{display:flex;justify-content:space-between;align-items:baseline;padding-top:12px;margin-top:4px;border-top:1px solid var(--line)}
+.grand span{font-weight:700}
+.grand b{font-size:30px;font-weight:800;color:var(--accent);line-height:1.2}
+.grand small{font-size:13px;color:var(--muted);font-weight:500;margin-inline-start:4px}
+.check{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);cursor:pointer;padding:2px 2px}
+.check input{width:22px;height:22px;min-height:0;accent-color:var(--green-hi);flex:none}
+.actions{display:flex;gap:10px}
+.actions .btn{flex:1}
+.actions .btn.grow{flex:2}
+
+/* inventory */
+.prod{display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.prod-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.prod h3{font-size:17px;font-weight:700;line-height:1.4}
+.prod .sub{font-size:12.5px;color:var(--muted)}
+.stock{display:flex;align-items:baseline;gap:8px}
+.stock b{font-size:30px;font-weight:800;line-height:1.1}
+.stock span{color:var(--muted);font-size:14px}
+.prod.is-low .stock b{color:var(--red-fg)}
+.life{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.life div{background:var(--surface-2);border-radius:12px;padding:8px 10px;min-width:0}
+.life small{display:block;font-size:11.5px;color:var(--muted);line-height:1.4}
+.life strong{font-size:14px;font-weight:700}
+.life div.est strong{color:var(--accent)}
+
+/* history */
+.day-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-block:10px 2px;font-size:13px;color:var(--muted);font-weight:700}
+.inv{cursor:pointer}
+.inv-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.inv-top .t{font-size:13px;color:var(--muted)}
+.inv-top .tot{font-weight:800;font-size:17px}
+.inv-items{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:6px;cursor:default}
+.inv-items .it{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}
+.inv-items .it span:first-child{min-width:0;overflow-wrap:anywhere}
+.inv-items .it span:last-child{white-space:nowrap}
+.inv-items .tot-r{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+
+/* report */
+.stat{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat small{font-size:12.5px;color:var(--muted)}
+.stat b{font-size:20px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+.stat b em{font-style:normal;font-size:12px;color:var(--muted);font-weight:500;margin-inline-start:3px}
+.stat.good b{color:var(--accent)}
+.stat.bad b{color:var(--red-fg)}
+.chart{width:100%;height:auto;display:block;direction:ltr}
+.chart .bar{fill:var(--green)}
+.chart .bar.today{fill:var(--green-hi)}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart text{fill:var(--muted);font-family:var(--font);font-size:10px}
+.chart .gl{paint-order:stroke;stroke:var(--surface);stroke-width:3px}
+.rank{display:flex;flex-direction:column;gap:10px}
+.rank .it{display:flex;flex-direction:column;gap:4px}
+.rank .it .h{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.rank .it .h span:first-child{min-width:0;overflow-wrap:anywhere}
+.rank .it .h span:last-child{white-space:nowrap;color:var(--muted)}
+.rank .meter{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.rank .meter i{display:block;height:100%;background:var(--green-hi);border-radius:99px}
+.alert{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--red-deep);border:1px solid var(--red);color:var(--red-fg);font-size:14px}
+.alert b{font-weight:700;overflow-wrap:anywhere}
+
+/* empty state */
+.empty{text-align:center;padding:28px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty svg{width:64px;height:64px;color:var(--green-hi)}
+.empty h3{font-size:17px}
+.empty p{color:var(--muted);font-size:14px;max-width:30ch}
+
+/* nav */
+.nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:25;background:rgba(11,13,11,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;
+  padding:8px max(10px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))
+}
+.nav button{
+  border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-size:12px;font-weight:600;padding:7px 0;border-radius:14px;cursor:pointer;position:relative
+}
+.nav button svg{width:23px;height:23px}
+.nav button.on{color:var(--accent);background:var(--green-deep)}
+.nav .badge{position:absolute;top:2px;inset-inline-start:calc(50% + 6px);min-width:18px;height:18px;border-radius:99px;background:var(--red);color:#fff;font-size:11px;display:grid;place-items:center;padding:0 5px;font-weight:700}
+
+/* sheet */
+.sheetwrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.62)}
+.sheet{
+  position:relative;width:100%;max-width:560px;max-height:88%;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-bottom:0;
+  border-radius:24px 24px 0 0;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  animation:up .22s ease-out
+}
+.grab{width:42px;height:4px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sheet h3{font-size:18px;font-weight:800;margin-bottom:12px}
+.sheet .stack{gap:12px}
+.cyc{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:12px;font-size:13.5px}
+.cyc .d{white-space:nowrap;font-weight:700}
+.cyc .d.live{color:var(--accent)}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:60;
+  background:var(--green-deep);border:1px solid var(--green);color:#eaf6ee;padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;
+  max-width:calc(100% - 32px);text-align:center
+}
+.toast.bad{background:var(--red-deep);border-color:var(--red);color:var(--red-fg)}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}.btn{transition:none}}
+.grid3{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:10px}
+.day{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.day-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-inline:2px;margin-block:0;color:var(--fg);font-size:15px;font-weight:400}
+.day-h h2{font-size:20px;font-weight:800;line-height:1.3}
+.day-h p{font-size:13px}
+.day-tot{text-align:left}
+.day-tot b{display:block;font-size:20px;font-weight:800;color:var(--accent);line-height:1.3}
+.day-tot small{font-size:12px;color:var(--muted)}
+.day-chips{display:flex;gap:8px;flex-wrap:wrap}
+.pur{display:flex;flex-direction:column;gap:8px}
+.pur-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.pitems{display:flex;flex-direction:column}
+.pit{display:flex;justify-content:space-between;gap:12px;padding-block:10px;border-top:1px dashed var(--line)}
+.pit-main{display:flex;flex-direction:column;min-width:0}
+.pit-main b{font-size:15.5px;font-weight:700;overflow-wrap:anywhere}
+.pit-main span{font-size:13px;color:var(--muted)}
+.pit-main .disc{color:var(--red-fg)}
+.pit-tot{font-size:16px;font-weight:800;white-space:nowrap}
+.pur-r{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+.pur-r.neg span:last-child{color:var(--red-fg)}
+.pur-r.tot{padding-top:10px;border-top:1px solid var(--line);align-items:baseline}
+.pur-r.tot b{font-size:18px;font-weight:800;color:var(--fg)}
+.edit-banner{border-color:var(--green);background:var(--green-deep)}
+.edit-banner b{font-size:15px}
+.edit-banner p{font-size:13px}
+.month-h{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--green-deep);border:1px solid var(--green);border-radius:16px;padding:12px 14px;margin-top:14px}
+.month-h h2{font-size:19px;font-weight:800;line-height:1.3}
+.month-h p{font-size:12.5px;color:#a9c9b8}
+.daystrip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.daystrip::-webkit-scrollbar{display:none}
+.daystrip button{flex:none;min-width:74px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:14px;padding:7px 12px;display:flex;flex-direction:column;align-items:center;cursor:pointer;font-size:12px;line-height:1.55}
+.daystrip button b{font-size:14px;font-weight:700;color:var(--fg);white-space:nowrap}
+.daystrip button.on{background:var(--green);border-color:var(--green-hi);color:#d6ecdf}
+.daystrip button.on b{color:#fff}
+</style>
+
+<header class="top">
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#121612" stroke="#252c26"/><circle cx="24" cy="24" r="11" fill="none" stroke="#2f8a61" stroke-width="5"/><circle cx="35" cy="13" r="4.5" fill="#8c2128"/></svg>
+    <div><h1>انیار</h1><p id="today" class="num"></p></div>
+  </div>
+  <button class="icon-btn" data-act="settings" aria-label="تنظیمات و پشتیبان"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+
+<main id="view" class="stack"></main>
+
+<nav class="nav" id="nav" aria-label="بخش‌های برنامه"></nav>
+
+<div class="sheetwrap" id="sheetwrap" hidden>
+  <div class="backdrop" data-act="closesheet"></div>
+  <div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetbody"></div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<datalist id="plist"></datalist>
+<datalist id="ulist"><option value="عدد"><option value="کیلو"><option value="گرم"><option value="لیتر"><option value="بسته"><option value="قوطی"><option value="شیشه"><option value="کارتن"></datalist>
+
+<script>
+/* ---------- helpers ---------- */
+const DAY=864e5;
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function num(s){
+  if(typeof s==='number')return isFinite(s)?s:0;
+  s=String(s==null?'':s)
+    .replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[٬,،\s]/g,'').replace(/٫/g,'.');
+  const v=parseFloat(s);return isFinite(v)?v:0;
+}
+const nf0=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
+const nf2=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2});
+const money=n=>nf0.format(Math.round(n||0));
+const fa=n=>nf2.format(n||0);
+const r3=n=>Math.round(n*1000)/1000;
+const norm=s=>String(s||'').trim().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\s+/g,' ').toLowerCase();
+const jFull=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const jDay=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{day:'numeric',month:'long'});
+const jWd=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{weekday:'long'});
+const jDM=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{day:'numeric',month:'long',year:'numeric'});
+const jTime=new Intl.DateTimeFormat('fa-IR',{hour:'2-digit',minute:'2-digit'});
+const jMK=new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{year:'numeric',month:'numeric'});
+const jMY=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{month:'long',year:'numeric'});
+const jDN=new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{day:'numeric'});
+const monthStart=t=>startOfDay(t)-(Number(jDN.format(t))-1)*DAY;
+const jKey=new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'});
+const wdShort=new Intl.DateTimeFormat('fa-IR',{weekday:'short'});
+const startOfDay=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+function fdays(d){return d==null?'—':d<1?'کمتر از ۱ روز':fa(Math.round(d))+' روز'}
+
+const IC={
+  receipt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5 9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M14 6l4 4"/></svg>'
+};
+
+/* ---------- state & storage ---------- */
+const KEY='aniar.v1';
+let S={products:[],events:[],invoices:[],draft:null,editing:null,tab:'invoice',period:'7',day:null};
+let R={};
+let storageOK=true;
+function newItem(){return{id:uid(),name:'',pid:null,price:'',qty:'1',dtype:'pct',dval:''}}
+function newDraft(){return{type:'buy',items:[newItem()],invType:'pct',invVal:'',applyStock:true,ago:'0',origAgo:0}}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){const d=JSON.parse(raw);S.products=d.products||[];S.events=d.events||[];S.invoices=d.invoices||[];S.draft=d.draft||null;S.editing=d.editing||null}
+  }catch(e){storageOK=false}
+  if(!S.draft||!Array.isArray(S.draft.items)||!S.draft.items.length)S.draft=newDraft();
+  if(S.draft.ago==null){S.draft.ago='0';S.draft.origAgo=0}
+  if(S.editing&&!S.invoices.some(i=>i.id===S.editing)){S.editing=null;S.draft=newDraft()}
+}
+function saveNow(){
+  try{localStorage.setItem(KEY,JSON.stringify({products:S.products,events:S.events,invoices:S.invoices,draft:S.draft,editing:S.editing}))}catch(e){storageOK=false}
+}
+let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(saveNow,200)}
+/* only purchases are tracked; anything saved earlier as a sale is ignored */
+const purchases=()=>S.invoices.filter(i=>i.type!=='sale');
+
+/* ---------- inventory engine ---------- */
+/* Every stock change is an event. Stock and "how many days it lasted" are recomputed from events,
+   so editing or deleting a purchase can never leave the numbers out of sync. */
+function replay(){
+  const map={};
+  for(const p of S.products)map[p.id]={stock:0,cycles:[],cur:null};
+  const ev=S.events.slice().sort((a,b)=>(a.t-b.t)||(a.id<b.id?-1:1));
+  for(const e of ev){
+    const m=map[e.pid];if(!m)continue;
+    const before=m.stock;
+    m.stock=Math.max(0,r3(before+e.delta));
+    if(e.delta>0){
+      if(before===0){m.cur={start:e.t,end:null,qty:e.delta,used:0,fromInit:e.kind==='init'};m.cycles.push(m.cur)}
+      else if(m.cur){m.cur.qty=r3(m.cur.qty+e.delta)}
+    }else{
+      const used=before-m.stock;
+      if(m.cur)m.cur.used=r3(m.cur.used+used);
+      if(m.stock===0&&m.cur){m.cur.end=e.t;m.cur=null}
+    }
+  }
+  return map;
+}
+function lifeStats(m){
+  const done=m.cycles.filter(c=>c.end&&!c.fromInit);
+  const days=done.map(c=>(c.end-c.start)/DAY);
+  const avg=days.length?days.reduce((a,b)=>a+b,0)/days.length:null;
+  const lastC=m.cycles.filter(c=>c.end).slice(-1)[0];
+  const last=lastC?(lastC.end-lastC.start)/DAY:null;
+  let remain=null;
+  if(m.cur&&m.stock>0){
+    const el=(Date.now()-m.cur.start)/DAY;
+    if(m.cur.used>0&&el>=0.25)remain=m.stock/(m.cur.used/el);
+    else if(avg!=null)remain=Math.max(0,avg-el);
+  }
+  return{avg,last,remain,count:done.length};
+}
+const findProduct=name=>{const n=norm(name);return n?S.products.find(p=>norm(p.name)===n)||null:null};
+function status(p){
+  const st=(R[p.id]||{stock:0}).stock;
+  if(st===0)return'empty';
+  if(num(p.min)>0&&st<=num(p.min))return'low';
+  return'ok';
+}
+const alerts=()=>S.products.filter(p=>status(p)!=='ok');
+
+/* ---------- purchase math ---------- */
+function calcLine(it){
+  const sub=Math.round(num(it.price)*num(it.qty));
+  let d=it.dtype==='pct'?sub*Math.min(100,Math.max(0,num(it.dval)))/100:num(it.dval);
+  d=Math.round(Math.min(sub,Math.max(0,d)));
+  return{sub,disc:d,total:sub-d};
+}
+function calcInvoice(d){
+  let sub=0,ld=0;
+  for(const it of d.items){const l=calcLine(it);sub+=l.sub;ld+=l.disc}
+  const after=sub-ld;
+  let idc=d.invType==='pct'?after*Math.min(100,Math.max(0,num(d.invVal)))/100:num(d.invVal);
+  idc=Math.round(Math.min(after,Math.max(0,idc)));
+  return{sub,ld,idc,total:after-idc};
+}
+function makeInvoice(id,t,raw,invType,invVal,applyStock){
+  const c=calcInvoice({items:raw,invType,invVal});
+  const items=raw.map(it=>{
+    const l=calcLine(it);
+    return{pid:it.pid||null,name:String(it.name).trim(),unit:it.unit||'',price:num(it.price),qty:num(it.qty),dtype:it.dtype||'pct',dval:num(it.dval),sub:l.sub,disc:l.disc,total:l.total};
+  });
+  return{id,t,type:'buy',items,subtotal:c.sub,lineDisc:c.ld,invType,invVal:num(invVal),invDisc:c.idc,total:c.total,applyStock:!!applyStock};
+}
+/* adds or replaces a purchase and rebuilds its stock events */
+function addInvoice(inv){
+  S.invoices=S.invoices.filter(i=>i.id!==inv.id);
+  S.invoices.push(inv);S.invoices.sort((a,b)=>b.t-a.t);
+  S.events=S.events.filter(e=>e.invoiceId!==inv.id);
+  if(inv.applyStock){
+    for(const ln of inv.items){
+      if(!ln.pid)continue;
+      S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:ln.qty,kind:'buy',invoiceId:inv.id,cost:ln.price});
+      const p=S.products.find(x=>x.id===ln.pid);if(p&&ln.price>0)p.cost=ln.price;
+    }
+  }
+}
+
+/* ---------- UI plumbing ---------- */
+function toast(msg,bad){
+  const t=$('#toast');t.textContent=msg;t.className='toast'+(bad?' bad':'');t.hidden=false;
+  clearTimeout(toast.t);toast.t=setTimeout(()=>{t.hidden=true},2400);
+}
+let sheetResolve=null;
+function openSheet(html){
+  if(sheetResolve){const r=sheetResolve;sheetResolve=null;r(false)}
+  $('#sheetbody').innerHTML=html;$('#sheetwrap').hidden=false;
+  const f=$('#sheetbody input:not([type=checkbox]),#sheetbody textarea');
+  if(f&&!f.readOnly&&matchMedia('(pointer:fine)').matches)f.focus();
+}
+function closeSheet(v){
+  $('#sheetwrap').hidden=true;
+  if(sheetResolve){const r=sheetResolve;sheetResolve=null;r(!!v)}
+}
+function ask(msg,okLabel,danger){
+  return new Promise(res=>{
+    openSheet(`<h3>${esc(msg)}</h3><div class="actions"><button class="btn ghost" data-act="ask-no">انصراف</button><button class="btn ${danger===false?'':'danger'}" data-act="ask-yes">${esc(okLabel||'تأیید')}</button></div>`);
+    sheetResolve=res;
+  });
+}
+function setSeg(box,val){box.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===val))}
+
+/* ---------- rendering ---------- */
+function render(){
+  R=replay();
+  $('#today').textContent=jFull.format(Date.now());
+  $('#plist').innerHTML=S.products.map(p=>`<option value="${esc(p.name)}">`).join('');
+  renderNav();
+  const v=$('#view');
+  ({invoice:viewInvoice,stock:viewStock,history:viewHistory,report:viewReport})[S.tab](v);
+}
+function renderNav(){
+  const n=alerts().length;
+  const tabs=[['invoice','ثبت خرید',IC.receipt],['history','لیست خرید',IC.list],['stock','انبار',IC.box],['report','گزارش',IC.chart]];
+  $('#nav').innerHTML=tabs.map(([k,l,i])=>`<button data-act="tab" data-v="${k}" class="${S.tab===k?'on':''}" ${S.tab===k?'aria-current="page"':''}>${i}<span>${l}</span>${k==='stock'&&n?`<i class="badge num">${fa(n)}</i>`:''}</button>`).join('');
+}
+
+/* --- purchase form (new or edit) --- */
+function draftTime(){
+  const d=S.draft,ago=Math.max(0,Math.round(num(d.ago)));
+  if(S.editing){const inv=S.invoices.find(i=>i.id===S.editing);if(inv)return inv.t-(ago-(d.origAgo||0))*DAY}
+  return Date.now()-ago*DAY;
+}
+function viewInvoice(v){
+  const d=S.draft,inv=S.editing?S.invoices.find(i=>i.id===S.editing):null;
+  v.innerHTML=`
+    ${inv?`<div class="card edit-banner"><div><b>در حال ویرایش خرید</b><p class="muted">${jFull.format(inv.t)} · ساعت ${jTime.format(inv.t)}</p></div></div>`:''}
+    <div id="rows" class="stack"></div>
+    <button class="btn ghost wide" data-act="addrow">${IC.plus} افزودن کالا</button>
+    <div class="card stack">
+      <label class="f">چند روز پیش خریدی؟ (۰ یعنی امروز)<input id="ago" inputmode="numeric" data-f="ago" value="${esc(d.ago)}"></label>
+      <p class="hint" id="agoLbl"></p>
+    </div>
+    <div class="card stack">
+      <div class="disc-row">
+        <label class="f">تخفیف کل خرید<input inputmode="decimal" id="invVal" data-f="invVal" placeholder="۰" value="${esc(d.invVal)}"></label>
+        <div class="seg mini" id="invSeg"><button data-act="itype" data-v="pct" class="${d.invType==='pct'?'on':''}">٪</button><button data-act="itype" data-v="amt" class="${d.invType==='amt'?'on':''}">تومان</button></div>
+      </div>
+    </div>
+    <div class="card summary">
+      <div class="r"><span>جمع کالاها</span><span class="num" id="t-sub">۰</span></div>
+      <div class="r neg" id="t-ld-r"><span>تخفیف کالاها</span><span class="num" id="t-ld">۰</span></div>
+      <div class="r neg" id="t-id-r"><span>تخفیف کل خرید</span><span class="num" id="t-id">۰</span></div>
+      <div class="grand"><span>مبلغ نهایی</span><div><b class="num" id="t-total">۰</b><small>تومان</small></div></div>
+    </div>
+    <label class="check"><input type="checkbox" id="applyStock" ${d.applyStock?'checked':''}><span>به موجودی انبار اضافه شود</span></label>
+    <div class="actions">${inv
+      ?'<button class="btn ghost" data-act="cancel-edit">انصراف</button><button class="btn grow" data-act="save-invoice">ذخیره تغییرات</button>'
+      :'<button class="btn danger" data-act="clear">پاک‌کردن</button><button class="btn grow" data-act="save-invoice">ثبت خرید</button>'}</div>`;
+  renderRows();
+}
+function rowHTML(it,i){
+  return`<div class="card line" data-i="${i}">
+    <div class="line-top">
+      <input data-f="name" list="plist" placeholder="نام کالا" autocomplete="off" value="${esc(it.name)}" aria-label="نام کالا">
+      <button class="icon-btn" data-act="delrow" aria-label="حذف ردیف">${IC.trash}</button>
+    </div>
+    <div class="hint" data-role="hint"></div>
+    <div class="grid2">
+      <label class="f">قیمت واحد (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
+      <label class="f">تعداد<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
+    </div>
+    <div class="disc-row">
+      <label class="f">تخفیف این کالا<input inputmode="decimal" data-f="dval" placeholder="۰" value="${esc(it.dval)}"></label>
+      <div class="seg mini" data-role="dseg"><button data-act="dtype" data-v="pct" class="${it.dtype==='pct'?'on':''}">٪</button><button data-act="dtype" data-v="amt" class="${it.dtype==='amt'?'on':''}">تومان</button></div>
+    </div>
+    <div class="line-sum"><span>قیمت کالا <span class="ld num" data-role="ld"></span></span><b class="num" data-role="lt">۰</b></div>
+  </div>`;
+}
+function renderRows(){
+  $('#rows').innerHTML=S.draft.items.map(rowHTML).join('');
+  updateTotals();
+}
+function updateTotals(){
+  const d=S.draft,c=calcInvoice(d);
+  document.querySelectorAll('#rows [data-i]').forEach(row=>{
+    const it=d.items[row.dataset.i];if(!it)return;
+    const l=calcLine(it);
+    row.querySelector('[data-role=lt]').textContent=money(l.total);
+    row.querySelector('[data-role=ld]').textContent=l.disc>0?'(تخفیف '+money(l.disc)+')':'';
+    const h=row.querySelector('[data-role=hint]');
+    const p=findProduct(it.name);
+    h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit:(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت به انبار اضافه می‌شود':'');
+  });
+  $('#t-sub').textContent=money(c.sub);
+  $('#t-ld').textContent='− '+money(c.ld);$('#t-ld-r').hidden=c.ld<=0;
+  $('#t-id').textContent='− '+money(c.idc);$('#t-id-r').hidden=c.idc<=0;
+  $('#t-total').textContent=money(c.total);
+  const al=$('#agoLbl');if(al)al.textContent='تاریخ خرید: '+jFull.format(draftTime());
+}
+function saveInvoice(){
+  const d=S.draft;
+  const items=d.items.filter(it=>norm(it.name)&&num(it.price)>0&&num(it.qty)>0);
+  if(!items.length){toast('حداقل یک کالا با نام، قیمت و تعداد وارد کن',true);return}
+  const editing=!!S.editing;
+  const t=draftTime();
+  const raw=items.map(it=>{
+    let p=findProduct(it.name);
+    if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:'عدد',price:0,cost:num(it.price),min:0};S.products.push(p)}
+    return{...it,pid:p?p.id:null,unit:p?p.unit:''};
+  });
+  addInvoice(makeInvoice(editing?S.editing:uid(),t,raw,d.invType,d.invVal,d.applyStock));
+  S.editing=null;S.draft=newDraft();saveNow();
+  if(editing)S.tab='history';
+  S.day=jKey.format(t);
+  render();
+  toast(editing?'تغییرات ذخیره شد':'خرید ثبت شد');
+}
+function startEdit(id){
+  const inv=S.invoices.find(i=>i.id===id);if(!inv)return;
+  const ago=Math.max(0,Math.round((startOfDay(Date.now())-startOfDay(inv.t))/DAY));
+  S.editing=id;
+  S.draft={type:'buy',items:inv.items.map(it=>({id:uid(),name:it.name,pid:it.pid,price:String(it.price),qty:String(it.qty),dtype:it.dtype||'pct',dval:it.dval?String(it.dval):''})),
+    invType:inv.invType||'pct',invVal:inv.invVal?String(inv.invVal):'',applyStock:inv.applyStock!==false,ago:String(ago),origAgo:ago};
+  S.tab='invoice';saveNow();render();scrollTo(0,0);
+}
+
+/* --- stock view --- */
+function viewStock(v){
+  if(!S.products.length){
+    v.innerHTML=`<div class="card empty">${IC.box}<h3>انبار خالیه</h3><p>کالاهات رو اضافه کن تا موجودی و مدت دوامشون رو ببینی. با ثبت خرید هم خودکار اضافه میشن.</p>
+      <button class="btn" data-act="newprod">${IC.plus} کالای جدید</button>
+      <button class="btn ghost sm" data-act="sample">ثبت چند نمونه برای امتحان</button></div>`;
+    return;
+  }
+  const order={empty:0,low:1,ok:2};
+  const list=S.products.slice().sort((a,b)=>order[status(a)]-order[status(b)]||a.name.localeCompare(b.name,'fa'));
+  v.innerHTML=`<button class="btn wide" data-act="newprod">${IC.plus} کالای جدید</button>`+list.map(p=>{
+    const m=R[p.id],st=status(p),ls=lifeStats(m);
+    const chip=st==='empty'?'<span class="chip empty">تمام شده</span>':st==='low'?'<span class="chip low">رو به اتمام</span>':'<span class="chip ok">موجود</span>';
+    const est=m.stock>0&&ls.remain!=null?(ls.remain<1?'کمتر از ۱ روز':'حدود '+fdays(ls.remain)):'—';
+    return`<article class="card prod ${st!=='ok'?'is-low':''}" data-act="openprod" data-id="${p.id}">
+      <div class="prod-top"><div><h3>${esc(p.name)}</h3><p class="sub">${num(p.cost)>0?'آخرین قیمت خرید '+money(p.cost)+' تومان':'بدون قیمت خرید'}</p></div>${chip}</div>
+      <div class="stock"><b class="num">${fa(m.stock)}</b><span>${esc(p.unit)}</span></div>
+      <div class="life">
+        <div><small>آخرین دوام</small><strong>${fdays(ls.last)}</strong></div>
+        <div><small>میانگین دوام</small><strong>${fdays(ls.avg)}</strong></div>
+        <div class="est"><small>تخمین باقی‌مانده</small><strong>${est}</strong></div>
+      </div>
+      <div class="actions"><button class="btn sm" data-act="restock" data-id="${p.id}">${IC.plus} خرید</button><button class="btn sm ghost" data-act="use" data-id="${p.id}">${IC.minus} مصرف</button></div>
+    </article>`;
+  }).join('');
+}
+function productForm(p){
+  const edit=!!p;
+  openSheet(`<h3>${edit?'ویرایش کالا':'کالای جدید'}</h3><div class="stack">
+    <label class="f">نام کالا<input id="pf-name" value="${esc(p?p.name:'')}" placeholder="مثلاً رب گوجه"></label>
+    <div class="grid2">
+      <label class="f">واحد<input id="pf-unit" list="ulist" value="${esc(p?p.unit:'عدد')}"></label>
+      <label class="f">قیمت خرید (تومان)<input id="pf-cost" inputmode="decimal" value="${p&&p.cost?esc(p.cost):''}" placeholder="۰"></label>
+    </div>
+    <div class="grid2">
+      <label class="f">هشدار وقتی کمتر شد از<input id="pf-min" inputmode="decimal" value="${p&&p.min?esc(p.min):''}" placeholder="۰"></label>
+      ${edit?'':'<label class="f">موجودی فعلی<input id="pf-init" inputmode="decimal" placeholder="۰"></label>'}
+    </div>
+    <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-prod" data-id="${p?p.id:''}">ذخیره</button></div>
+  </div>`);
+}
+function submitProduct(id){
+  const name=$('#pf-name').value.trim();
+  if(!name){toast('اسم کالا رو بنویس',true);return}
+  const dup=findProduct(name);
+  if(dup&&dup.id!==id){toast('این کالا قبلاً توی انبار هست',true);return}
+  const data={name,unit:$('#pf-unit').value.trim()||'عدد',min:num($('#pf-min').value),cost:num($('#pf-cost').value)};
+  if(id){Object.assign(S.products.find(p=>p.id===id),data)}
+  else{
+    const p={id:uid(),price:0,...data};S.products.push(p);
+    const init=num($('#pf-init').value);
+    if(init>0)S.events.push({id:uid(),t:Date.now(),pid:p.id,delta:init,kind:'init'});
+  }
+  saveNow();closeSheet();render();toast('ذخیره شد');
+}
+function productSheet(id){
+  const p=S.products.find(x=>x.id===id);if(!p)return;
+  const m=R[id],ls=lifeStats(m);
+  const cyc=m.cycles.slice().reverse().map(c=>{
+    const when=jDay.format(c.start)+(c.end?' تا '+jDay.format(c.end):'');
+    return`<div class="cyc"><span>${when}<br><small class="muted">${c.fromInit?'موجودی اولیه':'خرید'} ${fa(c.qty)} ${esc(p.unit)}</small></span>${c.end?`<span class="d num">${fdays((c.end-c.start)/DAY)}</span>`:'<span class="d live">در حال مصرف</span>'}</div>`;
+  }).join('')||'<p class="muted">هنوز خریدی ثبت نشده.</p>';
+  openSheet(`<h3>${esc(p.name)}</h3><div class="stack">
+    <div class="life"><div><small>موجودی</small><strong class="num">${fa(m.stock)} ${esc(p.unit)}</strong></div><div><small>میانگین دوام</small><strong>${fdays(ls.avg)}</strong></div><div><small>دوره‌های تمام‌شده</small><strong class="num">${fa(ls.count)}</strong></div></div>
+    <p class="sec-title">دوره‌های خرید و مصرف</p>${cyc}
+    <div class="actions"><button class="btn danger" data-act="delprod" data-id="${id}">حذف کالا</button><button class="btn ghost" data-act="editprod" data-id="${id}">ویرایش</button></div>
+  </div>`);
+}
+function moveSheet(id,kind){
+  const p=S.products.find(x=>x.id===id);if(!p)return;
+  const buy=kind==='buy';
+  openSheet(`<h3>${buy?'خرید جدید':'ثبت مصرف'} · ${esc(p.name)}</h3><div class="stack">
+    <label class="f">مقدار (${esc(p.unit)})<input id="mv-qty" inputmode="decimal" placeholder="۰"></label>
+    ${buy?`<label class="f">قیمت خرید هر ${esc(p.unit)} (تومان)<input id="mv-cost" inputmode="decimal" value="${p.cost?esc(p.cost):''}" placeholder="۰"></label>`:''}
+    <label class="f">چند روز پیش؟ (۰ یعنی امروز)<input id="mv-ago" inputmode="numeric" value="0"></label>
+    <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-move" data-id="${id}" data-kind="${kind}">ثبت</button></div>
+  </div>`);
+}
+function submitMove(id,kind){
+  const q=num($('#mv-qty').value);
+  if(q<=0){toast('مقدار رو وارد کن',true);return}
+  const ago=Math.max(0,num($('#mv-ago').value));
+  const t=Date.now()-ago*DAY;
+  const p=S.products.find(x=>x.id===id);
+  if(kind==='buy'){
+    /* a restock is recorded as a normal purchase so it shows in the purchase list */
+    const cost=num($('#mv-cost').value);
+    addInvoice(makeInvoice(uid(),t,[{name:p.name,pid:id,unit:p.unit,price:cost,qty:q,dtype:'pct',dval:0}],'pct',0,true));
+  }else{
+    S.events.push({id:uid(),t,pid:id,delta:-q,kind:'use'});
+  }
+  saveNow();closeSheet();render();toast(kind==='buy'?'خرید ثبت شد':'مصرف ثبت شد');
+}
+function loadSample(){
+  const now=Date.now();
+  const mk=(name,unit,cost,min)=>{const p={id:uid(),name,unit,price:0,cost,min};S.products.push(p);return p};
+  const rab=mk('رب گوجه','قوطی',68000,3),sh=mk('شکر','کیلو',52000,2),sir=mk('شیر','لیتر',28000,5),qh=mk('قهوه','کیلو',900000,1);
+  const buy=(d,lines,invVal)=>addInvoice(makeInvoice(uid(),now-d*DAY,lines.map(([p,price,qty,dv])=>({name:p.name,pid:p.id,unit:p.unit,price,qty,dtype:'pct',dval:dv||0})),'pct',invVal||0,true));
+  const use=(p,d,q)=>S.events.push({id:uid(),t:now-d*DAY,pid:p.id,delta:-q,kind:'use'});
+  buy(34,[[rab,68000,10]]);use(rab,25,10);
+  buy(24,[[rab,66000,10],[sh,52000,10]]);use(rab,15,8);use(rab,14,2);
+  buy(13,[[rab,68000,12,5],[qh,900000,2]],0);use(rab,4,9);use(sh,12,10);
+  buy(7,[[sh,52000,10,10],[sir,28000,30]]);use(sh,2,8);use(sir,1,26);
+  buy(1,[[sir,28000,12],[rab,68000,6]],5);
+  buy(0,[[qh,900000,1,8]]);
+  saveNow();render();toast('نمونه اضافه شد. از تنظیمات می‌تونی پاکش کنی');
+}
+
+/* --- purchase list, grouped by day --- */
+function dayHTML(g){
+  if(!g.list.length){
+    return`<section class="day"><div class="day-h"><div><h2>${jWd.format(g.t)}</h2><p class="muted num">${jDM.format(g.t)}</p></div></div>
+      <div class="card empty"><h3>این روز خریدی ثبت نشده</h3><button class="btn" data-act="tab" data-v="invoice">${IC.plus} ثبت خرید</button></div></section>`;
+  }
+  const lines=sum(g.list,i=>i.items.length),qty=sum(g.list,i=>sum(i.items,x=>x.qty)),tot=sum(g.list,i=>i.total);
+  return`<section class="day">
+    <div class="day-h"><div><h2>${jWd.format(g.t)}</h2><p class="muted num">${jDM.format(g.t)}</p></div><div class="day-tot"><b class="num">${money(tot)}</b><small>تومان</small></div></div>
+    <div class="day-chips"><span class="chip num">${fa(lines)} قلم</span><span class="chip num">جمع تعداد ${fa(qty)}</span>${g.list.length>1?`<span class="chip num">${fa(g.list.length)} بار خرید</span>`:''}</div>
+    ${g.list.map(inv=>purchaseCard(inv)).join('')}
+  </section>`;
+}
+function viewHistory(v){
+  const list=purchases();
+  if(!list.length){
+    v.innerHTML=`<div class="card empty">${IC.list}<h3>هنوز خریدی ثبت نشده</h3><p>بعد از ثبت اولین خرید، لیست هر روز جدا جدا اینجا نشون داده میشه.</p><button class="btn" data-act="tab" data-v="invoice">ثبت خرید</button></div>`;return;
+  }
+  const groups=[];
+  for(const inv of list){
+    const k=jKey.format(inv.t);let g=groups[groups.length-1];
+    if(!g||g.k!==k){g={k,t:inv.t,list:[]};groups.push(g)}
+    g.list.push(inv);
+  }
+  /* day strip: today (even if empty) + every day that has purchases */
+  const days=groups.slice(),tk=jKey.format(Date.now());
+  if(!days.some(g=>g.k===tk))days.unshift({k:tk,t:Date.now(),list:[]});
+  if(S.day!=='all'&&!days.some(g=>g.k===S.day))S.day=groups[0].k;
+  const strip=`<div class="daystrip" role="tablist" aria-label="روزهای خرید"><button role="tab" data-act="day" data-v="all" class="${S.day==='all'?'on':''}"><span>همه</span><b>روزها</b></button>`
+    +days.map(g=>`<button role="tab" data-act="day" data-v="${g.k}" class="${S.day===g.k?'on':''}"><span>${wdShort.format(g.t)}</span><b class="num">${jDay.format(g.t)}</b></button>`).join('')+`</div>`;
+  let html=strip;
+  if(S.day!=='all'){
+    html+=dayHTML(days.find(g=>g.k===S.day));
+  }else{
+    const allTotal=sum(list,i=>i.total),allLines=sum(list,i=>i.items.length),allQty=sum(list,i=>sum(i.items,x=>x.qty));
+    html+=`<div class="card grid3">
+      <div class="stat good"><small>جمع همه خریدها</small><b class="num">${money(allTotal)}<em>تومان</em></b></div>
+      <div class="stat"><small>تعداد قلم</small><b class="num">${fa(allLines)}</b></div>
+      <div class="stat"><small>جمع تعداد</small><b class="num">${fa(allQty)}</b></div></div>`;
+    const months=[];
+    for(const g of groups){
+      const k=jMK.format(g.t);let m=months[months.length-1];
+      if(!m||m.k!==k){m={k,t:g.t,days:[]};months.push(m)}
+      m.days.push(g);
+    }
+    for(const m of months){
+      const invs=m.days.flatMap(g=>g.list);
+      html+=`<div class="month-h"><div><h2>${jMY.format(m.t)}</h2><p class="num">${fa(m.days.length)} روز خرید · ${fa(sum(invs,i=>i.items.length))} قلم · جمع تعداد ${fa(sum(invs,i=>sum(i.items,x=>x.qty)))}</p></div><div class="day-tot"><b class="num">${money(sum(invs,i=>i.total))}</b><small>تومان</small></div></div>`;
+      for(const g of m.days)html+=dayHTML(g);
+    }
+  }
+  v.innerHTML=html;
+  try{const on=v.querySelector('.daystrip .on');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
+}
+function purchaseCard(inv){
+  const items=inv.items.map(it=>{
+    const dtxt=it.disc>0?`<span class="disc num">تخفیف ${it.dtype==='pct'&&it.dval?fa(it.dval)+'٪ ':''}(− ${money(it.disc)})</span>`:'';
+    return`<div class="pit"><div class="pit-main"><b>${esc(it.name)}</b><span class="num">${fa(it.qty)} ${esc(it.unit||'')} × ${money(it.price)}</span>${dtxt}</div><b class="pit-tot num">${money(it.total)}</b></div>`;
+  }).join('');
+  return`<article class="card pur">
+    <div class="pur-top"><span class="muted num">ساعت ${jTime.format(inv.t)}</span>
+      <div class="row"><button class="btn sm ghost" data-act="editinv" data-id="${inv.id}">${IC.edit} ویرایش</button><button class="icon-btn sm" data-act="delinv" data-id="${inv.id}" aria-label="حذف خرید">${IC.trash}</button></div></div>
+    <div class="pitems">${items}</div>
+    ${inv.invDisc>0?`<div class="pur-r neg"><span>تخفیف کل خرید</span><span class="num">− ${money(inv.invDisc)}</span></div>`:''}
+    <div class="pur-r tot"><span>جمع این خرید</span><b class="num">${money(inv.total)}</b></div>
+  </article>`;
+}
+
+/* --- report view (purchases only) --- */
+function viewReport(v){
+  const now=Date.now(),P=S.period;
+  const from=P==='today'?startOfDay(now):P==='all'?0:P==='month'?monthStart(now):now-Number(P)*DAY;
+  const inv=purchases().filter(i=>i.t>=from);
+  const total=sum(inv,i=>i.total),disc=sum(inv,i=>i.lineDisc+i.invDisc);
+  const lines=sum(inv,i=>i.items.length),qty=sum(inv,i=>sum(i.items,x=>x.qty));
+  const days=[];
+  for(let k=6;k>=0;k--){
+    const s=startOfDay(now-k*DAY);
+    days.push({s,label:wdShort.format(s),v:sum(purchases().filter(i=>i.t>=s&&i.t<s+DAY),i=>i.total),today:k===0});
+  }
+  const max=Math.max(1,...days.map(d=>d.v));
+  const W=320,H=130,top=14,bot=112,bw=30,slot=W/7;
+  const bars=days.map((d,i)=>{
+    const h=Math.max(d.v>0?3:0,(bot-top)*d.v/max);
+    return`<rect class="bar ${d.today?'today':''}" x="${(i*slot+(slot-bw)/2).toFixed(1)}" y="${(bot-h).toFixed(1)}" width="${bw}" height="${h.toFixed(1)}" rx="6"/><text x="${(i*slot+slot/2).toFixed(1)}" y="126" text-anchor="middle">${d.label}</text>`;
+  }).join('');
+  const chart=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="نمودار خرید هفت روز اخیر"><line class="grid" x1="0" x2="${W}" y1="${top}" y2="${top}"/><line class="grid" x1="0" x2="${W}" y1="${(top+bot)/2}" y2="${(top+bot)/2}"/><line class="grid" x1="0" x2="${W}" y1="${bot}" y2="${bot}"/>${bars}<text class="gl" x="2" y="${top-3}">${money(max)}</text><text class="gl" x="2" y="${(top+bot)/2-3}">${money(max/2)}</text></svg>`;
+  const agg={};
+  for(const i of inv)for(const it of i.items){const k=norm(it.name);(agg[k]=agg[k]||{name:it.name,unit:it.unit,qty:0,rev:0});agg[k].qty+=it.qty;agg[k].rev+=it.total}
+  const top5=Object.values(agg).sort((a,b)=>b.rev-a.rev).slice(0,5),mx=top5.length?top5[0].rev||1:1;
+  const al=alerts();
+  v.innerHTML=`
+    <div class="seg" id="perSeg">${[['today','امروز'],['7','۷ روز'],['month','این ماه'],['all','همه']].map(([k,l])=>`<button data-act="period" data-v="${k}" class="${P===k?'on':''}">${l}</button>`).join('')}</div>
+    <div class="card grid2" style="row-gap:16px">
+      <div class="stat good" style="grid-column:1/-1"><small>جمع خرید</small><b class="num">${money(total)}<em>تومان</em></b></div>
+      <div class="stat"><small>تعداد قلم</small><b class="num">${fa(lines)}</b></div>
+      <div class="stat"><small>جمع تعداد</small><b class="num">${fa(qty)}</b></div>
+      <div class="stat" style="grid-column:1/-1"><small>تخفیف گرفته‌شده</small><b class="num">${money(disc)}<em>تومان</em></b></div>
+    </div>
+    <div class="card stack"><p class="sec-title" style="margin:0">خرید ۷ روز اخیر (تومان)</p>${chart}</div>
+    <div class="card stack"><p class="sec-title" style="margin:0">بیشترین خرج</p>${top5.length?`<div class="rank">${top5.map(t=>`<div class="it"><div class="h"><span>${esc(t.name)} <span class="muted num">× ${fa(t.qty)}</span></span><span class="num">${money(t.rev)}</span></div><div class="meter"><i style="width:${Math.max(4,t.rev/mx*100).toFixed(0)}%"></i></div></div>`).join('')}</div>`:'<p class="muted">در این بازه خریدی ثبت نشده.</p>'}</div>
+    ${al.length?`<div class="card stack"><p class="sec-title" style="margin:0">هشدار موجودی</p>${al.map(p=>`<div class="alert"><b>${esc(p.name)}</b><span class="num">${status(p)==='empty'?'تمام شده':fa(R[p.id].stock)+' '+esc(p.unit)+' مانده'}</span></div>`).join('')}</div>`:''}`;
+}
+
+/* --- settings / backup --- */
+function settingsSheet(){
+  const json=JSON.stringify({app:'aniar',v:1,products:S.products,events:S.events,invoices:S.invoices});
+  openSheet(`<h3>تنظیمات و پشتیبان</h3><div class="stack">
+    ${storageOK?'':'<div class="alert"><b>ذخیره‌سازی این مرورگر کار نمی‌کنه. حتماً پشتیبان بگیر.</b></div>'}
+    <p class="muted" style="font-size:13.5px">اطلاعات فقط روی همین گوشی ذخیره میشه. گاهی یه نسخه پشتیبان بگیر و جایی نگه دار.</p>
+    <label class="f">پشتیبان (متن رو کپی کن)<textarea id="bk" readonly>${esc(json)}</textarea></label>
+    <div class="actions"><button class="btn sm" data-act="bk-copy">کپی پشتیبان</button><button class="btn sm ghost" data-act="bk-dl">دانلود فایل</button></div>
+    <label class="f">بازیابی (متن پشتیبان رو اینجا بچسبون)<textarea id="rs" placeholder="{...}"></textarea></label>
+    <button class="btn ghost" data-act="bk-restore">بازیابی از متن</button>
+    <button class="btn danger" data-act="wipe">پاک‌کردن همه اطلاعات</button>
+  </div>`);
+}
+async function restore(){
+  let d;
+  try{d=JSON.parse($('#rs').value.trim())}catch(e){toast('متن پشتیبان معتبر نیست',true);return}
+  if(!d||!Array.isArray(d.products)||!Array.isArray(d.events)||!Array.isArray(d.invoices)){toast('این متن پشتیبان انیار نیست',true);return}
+  if(!await ask('اطلاعات فعلی با پشتیبان جایگزین بشه؟','جایگزین کن'))return;
+  S.products=d.products;S.events=d.events;S.invoices=d.invoices;S.draft=newDraft();S.editing=null;saveNow();render();toast('بازیابی شد');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('input',e=>{
+  const t=e.target;if(!t.dataset||!t.dataset.f||S.tab!=='invoice')return;
+  const d=S.draft;
+  if(t.dataset.f==='invVal'||t.dataset.f==='ago'){d[t.dataset.f]=t.value}
+  else{
+    const row=t.closest('[data-i]');if(!row)return;
+    const it=d.items[row.dataset.i];if(!it)return;
+    it[t.dataset.f]=t.value;
+    if(t.dataset.f==='name'){
+      const p=findProduct(t.value);it.pid=p?p.id:null;
+      if(p&&!num(it.price)&&num(p.cost)>0){it.price=String(p.cost);row.querySelector('[data-f=price]').value=p.cost}
+    }
+  }
+  updateTotals();save();
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='applyStock'){S.draft.applyStock=e.target.checked;updateTotals();save()}
+});
+document.addEventListener('click',async e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act,id=el.dataset.id,v=el.dataset.v;
+  const row=el.closest('[data-i]'),it=row?S.draft.items[row.dataset.i]:null;
+  switch(a){
+    case'tab':S.tab=v;render();scrollTo(0,0);break;
+    case'itype':S.draft.invType=v;setSeg($('#invSeg'),v);updateTotals();save();break;
+    case'dtype':if(it){it.dtype=v;setSeg(row.querySelector('[data-role=dseg]'),v);updateTotals();save()}break;
+    case'addrow':{S.draft.items.push(newItem());renderRows();const ins=document.querySelectorAll('#rows [data-f=name]');ins[ins.length-1].focus();save();break}
+    case'delrow':
+      if(S.draft.items.length===1)S.draft.items=[newItem()];else S.draft.items.splice(Number(row.dataset.i),1);
+      renderRows();save();break;
+    case'inc':case'dec':if(it){
+      const q=Math.max(0,num(it.qty)+(a==='inc'?1:-1));it.qty=String(r3(q));
+      row.querySelector('[data-f=qty]').value=it.qty;updateTotals();save()}break;
+    case'clear':
+      if(await ask('همه‌ی ردیف‌های این خرید پاک بشه؟','پاک کن')){S.draft=newDraft();saveNow();render()}break;
+    case'cancel-edit':S.editing=null;S.draft=newDraft();S.tab='history';saveNow();render();break;
+    case'save-invoice':saveInvoice();break;
+    case'editinv':startEdit(id);break;
+    case'newprod':productForm(null);break;
+    case'sample':loadSample();break;
+    case'openprod':productSheet(id);break;
+    case'editprod':productForm(S.products.find(p=>p.id===id));break;
+    case'delprod':
+      if(await ask('این کالا و همه‌ی سابقه‌ی انبارش پاک بشه؟','حذف کن')){
+        S.products=S.products.filter(p=>p.id!==id);S.events=S.events.filter(x=>x.pid!==id);saveNow();render();toast('کالا حذف شد')}break;
+    case'submit-prod':submitProduct(id||null);break;
+    case'restock':moveSheet(id,'buy');break;
+    case'use':moveSheet(id,'use');break;
+    case'submit-move':submitMove(id,el.dataset.kind);break;
+    case'delinv':
+      if(await ask('این خرید حذف بشه؟ موجودی انبار هم به حالت قبل برمی‌گرده.','حذف کن')){
+        S.invoices=S.invoices.filter(i=>i.id!==id);S.events=S.events.filter(x=>x.invoiceId!==id);
+        if(S.editing===id){S.editing=null;S.draft=newDraft()}
+        saveNow();render();toast('خرید حذف شد')}break;
+    case'period':S.period=v;render();break;
+    case'day':S.day=v;viewHistory($('#view'));break;
+    case'settings':settingsSheet();break;
+    case'bk-copy':{
+      const ta=$('#bk');
+      try{await navigator.clipboard.writeText(ta.value);toast('کپی شد')}catch(err){ta.focus();ta.select();toast('متن انتخاب شد، کپی کن')}break}
+    case'bk-dl':{
+      try{const u=URL.createObjectURL(new Blob([$('#bk').value],{type:'application/json'}));const l=document.createElement('a');l.href=u;l.download='aniar-backup.json';document.body.appendChild(l);l.click();l.remove();toast('اگه فایل ذخیره نشد، از «کپی پشتیبان» استفاده کن')}catch(err){toast('دانلود نشد، کپی کن',true)}break}
+    case'bk-restore':restore();break;
+    case'wipe':
+      if(await ask('همه‌ی کالاها، خریدها و سابقه‌ها برای همیشه پاک بشن؟','پاک کن')){
+        S.products=[];S.events=[];S.invoices=[];S.draft=newDraft();S.editing=null;saveNow();closeSheet();render();toast('همه‌چیز پاک شد')}break;
+    case'closesheet':closeSheet(false);break;
+    case'ask-yes':closeSheet(true);break;
+    case'ask-no':closeSheet(false);break;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetwrap').hidden)closeSheet(false)});
+
+load();render();
+</script>
+
+</body>
+</html>
