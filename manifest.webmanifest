@@ -1,0 +1,21 @@
+{
+  "name": "انیار",
+  "short_name": "انیار",
+  "description": "مدیریت خرید و موجودی کافه انیار",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d0b",
+  "theme_color": "#0b0d0b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
