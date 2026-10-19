@@ -231,6 +231,25 @@ label.f>input{color:var(--fg)}
   max-width:calc(100% - 32px);text-align:center
 }
 .toast.bad{background:var(--red-deep);border-color:var(--red);color:var(--red-fg)}
+/* Light theme */
+:root.light-theme{
+  --bg:#f4f6f3;--surface:#ffffff;--surface-2:#e9eee9;--line:#d5ddd5;
+  --fg:#202820;--muted:#647064;--green:#246b49;--green-hi:#2f8a61;--green-deep:#dceee3;
+  --accent:#246b49;--red:#a82c35;--red-deep:#f8e4e5;--red-fg:#9a2029;color-scheme:light;
+}
+:root.light-theme body::before{background:var(--bg)}
+:root.light-theme .icon-btn{background:var(--surface);color:var(--muted)}
+:root.light-theme input,:root.light-theme textarea,:root.light-theme .seg{background:#fff;color:var(--fg)}
+:root.light-theme input::placeholder,:root.light-theme textarea::placeholder{color:#899489}
+:root.light-theme .nav{background:rgba(244,246,243,.95)}
+:root.light-theme .auth-screen{background:radial-gradient(ellipse at top right,#dceee3 0%,var(--bg) 58%)}
+:root.light-theme .auth-card{background:rgba(255,255,255,.97);box-shadow:0 24px 80px rgba(30,50,30,.12)}
+:root.light-theme .chart .gl{stroke:var(--surface)}
+:root.light-theme .month-h{background:#e1efe5}
+:root.light-theme .month-h p{color:#4d7059}
+:root.light-theme .daystrip button.on{color:#fff}
+:root.light-theme .daystrip button.on b{color:#fff}
+.theme-toggle{margin-inline-start:auto}
 @media (prefers-reduced-motion:reduce){.sheet{animation:none}.btn{transition:none}}
 .grid3{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:10px}
 .day{display:flex;flex-direction:column;gap:10px;margin-top:8px}
@@ -298,6 +317,7 @@ body.auth-required .top,body.auth-required #view,body.auth-required #nav,body.au
   </div>
   <button class="icon-btn" data-act="logout" aria-label="خروج از حساب" title="خروج از حساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button>
   <button class="icon-btn" data-act="settings" aria-label="تنظیمات و پشتیبان"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  <button class="icon-btn theme-toggle" data-act="theme" aria-label="تغییر به حالت روشن" title="تغییر به حالت روشن"><svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
 </header>
 
 <main id="view" class="stack"></main>
@@ -870,6 +890,7 @@ document.addEventListener('click',async e=>{
   const a=el.dataset.act,id=el.dataset.id,v=el.dataset.v;
   const row=el.closest('[data-i]'),it=row?S.draft.items[row.dataset.i]:null;
   switch(a){
+    case'theme':toggleTheme();break;
     case'tab':S.tab=v;render();scrollTo(0,0);break;
     case'itype':S.draft.invType=v;setSeg($('#invSeg'),v);updateTotals();save();break;
     case'dtype':if(it){it.dtype=v;setSeg(row.querySelector('[data-role=dseg]'),v);updateTotals();save()}break;
@@ -1004,6 +1025,24 @@ async function logout(){
   const {error}=await supabaseClient.auth.signOut();if(error){toast('خروج ناموفق بود',true);return}
   authUser=null;cloudReady=false;showAuth();setAuthMode('signin');
 }
+const THEME_KEY='aniar.theme.v1';
+function applyTheme(theme){
+  const light=theme==='light';
+  document.documentElement.classList.toggle('light-theme',light);
+  try{localStorage.setItem(THEME_KEY,light?'light':'dark')}catch(e){}
+  const b=document.querySelector('[data-act="theme"]');
+  if(b){
+    b.setAttribute('aria-label',light?'تغییر به حالت تیره':'تغییر به حالت روشن');
+    b.title=light?'تغییر به حالت تیره':'تغییر به حالت روشن';
+    b.innerHTML=light
+      ? '<svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>'
+      : '<svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>';
+  }
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.content=light?'#f4f6f3':'#0b0d0b';
+}
+function toggleTheme(){applyTheme(document.documentElement.classList.contains('light-theme')?'dark':'light')}
+try{applyTheme(localStorage.getItem(THEME_KEY)==='light'?'light':'dark')}catch(e){applyTheme('dark')}
 async function initApp(){
   load();setAuthMode('signin');
   $('#auth-submit').addEventListener('click',submitAuth);
