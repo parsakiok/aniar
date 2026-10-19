@@ -946,18 +946,26 @@ async function cloudSave(){
   }catch(err){console.error('Aniar cloud save failed:',err);toast('ذخیره ابری انجام نشد؛ اتصال و تنظیمات Supabase را بررسی کن',true)}
   finally{cloudBusy=false;if(cloudPending){cloudPending=false;cloudSave()}}
 }
+const OWNER_KEY='aniar.owner.v1';
 async function bootstrapUser(user){
   authUser=user;cloudReady=false;
   try{
     const {data,error}=await supabaseClient.from('aniar_user_data').select('data').eq('user_id',user.id).maybeSingle();
     if(error)throw error;
+    const previousOwner=localStorage.getItem(OWNER_KEY);
     if(data&&data.data&&typeof data.data==='object'){
       const d=data.data;S.products=Array.isArray(d.products)?d.products:[];S.events=Array.isArray(d.events)?d.events:[];S.invoices=Array.isArray(d.invoices)?d.invoices:[];
-      S.draft=S.draft||newDraft();S.editing=null;saveNow(true);
+      S.draft=newDraft();S.editing=null;
     }else{
+      // Never copy a previous account's local data into a different user's empty cloud account.
+      if(previousOwner&&previousOwner!==user.id){
+        S.products=[];S.events=[];S.invoices=[];S.draft=newDraft();S.editing=null;
+      }
       const {error:saveError}=await supabaseClient.from('aniar_user_data').upsert({user_id:user.id,data:cloudPayload(),updated_at:new Date().toISOString()},{onConflict:'user_id'});
-      if(saveError)throw saveError;saveNow(true);
+      if(saveError)throw saveError;
     }
+    try{localStorage.setItem(OWNER_KEY,user.id)}catch(e){}
+    saveNow(true);
     cloudReady=true;hideAuth();render();toast('حساب متصل شد؛ اطلاعات با فضای ابری همگام است');
   }catch(err){console.error('Aniar cloud load failed:',err);cloudReady=false;showAuth('اتصال ابری ناموفق بود. ابتدا supabase/schema.sql را در SQL Editor اجرا کن. '+(err.message||''))}
 }
