@@ -266,13 +266,37 @@ label.f>input{color:var(--fg)}
 .daystrip button b{font-size:14px;font-weight:700;color:var(--fg);white-space:nowrap}
 .daystrip button.on{background:var(--green);border-color:var(--green-hi);color:#d6ecdf}
 .daystrip button.on b{color:#fff}
+
+/* --- account / sign-in --- */
+.auth-screen{position:fixed;inset:0;z-index:100;overflow:auto;background:radial-gradient(ellipse at top right,#123626 0%,var(--bg) 58%);padding:calc(28px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:center}
+.auth-card{width:100%;max-width:420px;background:rgba(18,22,18,.96);border:1px solid var(--line);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.auth-logo{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--line);color:var(--accent);font-size:28px;font-weight:800}
+.auth-card h2{font-size:25px;font-weight:800}.auth-card p{font-size:13.5px;color:var(--muted)}
+.auth-card .auth-error{color:var(--red-fg);font-size:13px;min-height:0}.auth-card .auth-error:empty{display:none}
+.auth-card .auth-links{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.auth-card .auth-links button{background:none;border:0;color:var(--accent);font:inherit;font-weight:700;cursor:pointer}
+body.auth-required .top,body.auth-required #view,body.auth-required #nav,body.auth-required #sheetwrap{display:none!important}
 </style>
 
+
+<section id="auth-screen" class="auth-screen" hidden aria-labelledby="auth-title">
+  <div class="auth-card">
+    <div class="auth-logo" aria-hidden="true">ا</div>
+    <div><h2 id="auth-title">ورود به انیار</h2><p id="auth-subtitle">برای دیدن و همگام‌سازی اطلاعات کافه وارد حساب خودت شو.</p></div>
+    <label class="f">ایمیل<input id="auth-email" type="email" autocomplete="email" placeholder="name@example.com" dir="ltr" required></label>
+    <label class="f">رمز عبور<input id="auth-password" type="password" autocomplete="current-password" placeholder="حداقل ۶ کاراکتر" dir="ltr" minlength="6" required></label>
+    <p id="auth-error" class="auth-error" role="status" aria-live="polite"></p>
+    <button class="btn wide" id="auth-submit" data-auth="signin">ورود امن</button>
+    <div class="auth-links"><span id="auth-switch-label">حساب نداری؟</span><button type="button" id="auth-switch">ساخت حساب جدید</button></div>
+    <p>اطلاعات هر حساب به‌صورت جداگانه ذخیره می‌شود. برای بازیابی اطلاعات، از همان ایمیل استفاده کن.</p>
+  </div>
+</section>
 <header class="top">
   <div class="brand">
     <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="14" fill="#121612" stroke="#252c26"/><circle cx="24" cy="24" r="11" fill="none" stroke="#2f8a61" stroke-width="5"/><circle cx="35" cy="13" r="4.5" fill="#8c2128"/></svg>
     <div><h1>انیار</h1><p id="today" class="num"></p></div>
   </div>
+  <button class="icon-btn" data-act="logout" aria-label="خروج از حساب" title="خروج از حساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button>
   <button class="icon-btn" data-act="settings" aria-label="تنظیمات و پشتیبان"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </header>
 
@@ -287,6 +311,13 @@ label.f>input{color:var(--fg)}
 <div class="toast" id="toast" hidden></div>
 <datalist id="plist"></datalist>
 <datalist id="ulist"><option value="عدد"><option value="کیلو"><option value="گرم"><option value="لیتر"><option value="بسته"><option value="قوطی"><option value="شیشه"><option value="کارتن"></datalist>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://uzygfmpjm kggqftlxrhs.supabase.co'.replace(' ', '');
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6eWdmbXBqbWtnZ3F0bHhyaHMiiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNDczOTQsImV4cCI6MjEwNzkyMzM5NH0.ZdybDhFSwadSzqpjmX5SSUPyzj7hwGTIUvmDs6egEQk';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
 <script>
 /* ---------- helpers ---------- */
@@ -350,8 +381,12 @@ function load(){
   if(S.draft.ago==null){S.draft.ago='0';S.draft.origAgo=0}
   if(S.editing&&!S.invoices.some(i=>i.id===S.editing)){S.editing=null;S.draft=newDraft()}
 }
-function saveNow(){
+function saveNow(skipCloud=false){
   try{localStorage.setItem(KEY,JSON.stringify({products:S.products,events:S.events,invoices:S.invoices,draft:S.draft,editing:S.editing}))}catch(e){storageOK=false}
+  if(!skipCloud&&authUser&&cloudReady){
+    clearTimeout(cloudTimer);
+    cloudTimer=setTimeout(()=>cloudSave(),650);
+  }
 }
 let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(saveNow,200)}
 /* only purchases are tracked; anything saved earlier as a sale is ignored */
@@ -869,6 +904,7 @@ document.addEventListener('click',async e=>{
     case'period':S.period=v;render();break;
     case'day':S.day=v;viewHistory($('#view'));break;
     case'settings':settingsSheet();break;
+    case'logout':logout();break;
     case'bk-copy':{
       const ta=$('#bk');
       try{await navigator.clipboard.writeText(ta.value);toast('کپی شد')}catch(err){ta.focus();ta.select();toast('متن انتخاب شد، کپی کن')}break}
@@ -885,20 +921,81 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetwrap').hidden)closeSheet(false)});
 
-load();render();
+
+/* ---------- authentication & cloud sync ---------- */
+let authUser=null, cloudReady=false, cloudTimer=null, cloudBusy=false, cloudPending=false, authMode='signin';
+function showAuth(message=''){document.body.classList.add('auth-required');$('#auth-screen').hidden=false;$('#auth-error').textContent=message}
+function hideAuth(){$('#auth-screen').hidden=true;document.body.classList.remove('auth-required');$('#auth-error').textContent=''}
+function setAuthMode(mode){
+  authMode=mode;const signup=mode==='signup';
+  $('#auth-title').textContent=signup?'ساخت حساب انیار':'ورود به انیار';
+  $('#auth-subtitle').textContent=signup?'یک حساب بساز تا اطلاعات انیار بین دستگاه‌ها همگام شود.':'برای دیدن و همگام‌سازی اطلاعات کافه وارد حساب خودت شو.';
+  $('#auth-submit').textContent=signup?'ساخت حساب':'ورود امن';
+  $('#auth-submit').dataset.auth=mode;
+  $('#auth-switch-label').textContent=signup?'حساب داری؟':'حساب نداری؟';
+  $('#auth-switch').textContent=signup?'برگشت به ورود':'ساخت حساب جدید';
+  $('#auth-password').autocomplete=signup?'new-password':'current-password';$('#auth-error').textContent='';
+}
+function cloudPayload(){return {products:S.products,events:S.events,invoices:S.invoices}}
+async function cloudSave(){
+  if(!authUser||!cloudReady)return;
+  if(cloudBusy){cloudPending=true;return}cloudBusy=true;
+  try{
+    const {error}=await supabaseClient.from('aniar_user_data').upsert({user_id:authUser.id,data:cloudPayload(),updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    if(error)throw error;
+  }catch(err){console.error('Aniar cloud save failed:',err);toast('ذخیره ابری انجام نشد؛ اتصال و تنظیمات Supabase را بررسی کن',true)}
+  finally{cloudBusy=false;if(cloudPending){cloudPending=false;cloudSave()}}
+}
+async function bootstrapUser(user){
+  authUser=user;cloudReady=false;
+  try{
+    const {data,error}=await supabaseClient.from('aniar_user_data').select('data').eq('user_id',user.id).maybeSingle();
+    if(error)throw error;
+    if(data&&data.data&&typeof data.data==='object'){
+      const d=data.data;S.products=Array.isArray(d.products)?d.products:[];S.events=Array.isArray(d.events)?d.events:[];S.invoices=Array.isArray(d.invoices)?d.invoices:[];
+      S.draft=S.draft||newDraft();S.editing=null;saveNow(true);
+    }else{
+      const {error:saveError}=await supabaseClient.from('aniar_user_data').upsert({user_id:user.id,data:cloudPayload(),updated_at:new Date().toISOString()},{onConflict:'user_id'});
+      if(saveError)throw saveError;saveNow(true);
+    }
+    cloudReady=true;hideAuth();render();toast('حساب متصل شد؛ اطلاعات با فضای ابری همگام است');
+  }catch(err){console.error('Aniar cloud load failed:',err);cloudReady=false;showAuth('اتصال ابری ناموفق بود. ابتدا supabase/schema.sql را در SQL Editor اجرا کن. '+(err.message||''))}
+}
+async function submitAuth(){
+  const email=$('#auth-email').value.trim().toLowerCase(),password=$('#auth-password').value;
+  if(!email||!$('#auth-email').checkValidity()){showAuth('ایمیل معتبر وارد کن.');return}
+  if(password.length<6){showAuth('رمز عبور باید حداقل ۶ کاراکتر باشد.');return}
+  const button=$('#auth-submit');button.disabled=true;button.textContent='لطفاً صبر کن…';$('#auth-error').textContent='';
+  try{
+    if(authMode==='signup'){
+      const {data,error}=await supabaseClient.auth.signUp({email,password});if(error)throw error;
+      if(!data.session){setAuthMode('signin');$('#auth-email').value=email;showAuth('حساب ساخته شد. اگر تأیید ایمیل در Supabase روشن است، ایمیلت را تأیید کن و بعد وارد شو.');return}
+      await bootstrapUser(data.user);
+    }else{
+      const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;await bootstrapUser(data.user);
+    }
+  }catch(err){
+    const msg=String(err&&err.message||'خطای نامشخص');
+    showAuth(msg.includes('Invalid login credentials')?'ایمیل یا رمز عبور اشتباه است.':msg.includes('Failed to fetch')?'اتصال اینترنت یا تنظیمات Supabase را بررسی کن.':msg);
+  }finally{button.disabled=false;setAuthMode(authMode)}
+}
+async function logout(){
+  const {error}=await supabaseClient.auth.signOut();if(error){toast('خروج ناموفق بود',true);return}
+  authUser=null;cloudReady=false;showAuth();setAuthMode('signin');
+}
+async function initApp(){
+  load();setAuthMode('signin');
+  $('#auth-submit').addEventListener('click',submitAuth);
+  $('#auth-switch').addEventListener('click',()=>setAuthMode(authMode==='signin'?'signup':'signin'));
+  $('#auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')submitAuth()});
+  $('#auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auth-password').focus()});
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error){showAuth('ورود به Supabase ناموفق بود: '+error.message);return}
+  if(data.session?.user)await bootstrapUser(data.session.user);else showAuth();
+}
+
+initApp();
 </script>
   
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = 'https://uzygfmpjm kggqftlxrhs.supabase.co'.replace(' ', '');
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6eWdmbXBqbWtnZ3FmdGx4cmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNDczOTQsImV4cCI6MjEwNzkyMzM5NH0.ZdybDhFSwadSzqpjmX5SSUPyzj7hwGTIUvmDs6egEQk';
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-</script>
-
-
 </body>
 </html>
