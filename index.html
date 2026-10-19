@@ -315,7 +315,7 @@ body.auth-required .top,body.auth-required #view,body.auth-required #nav,body.au
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://uzygfmpjm kggqftlxrhs.supabase.co'.replace(' ', '');
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6eWdmbXBqbWtnZ3F0bHhyaHMiiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNDczOTQsImV4cCI6MjEwNzkyMzM5NH0.ZdybDhFSwadSzqpjmX5SSUPyzj7hwGTIUvmDs6egEQk';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6eWdmbXBqbWtnZ3FmdGx4cmhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNDczOTQsImV4cCI6MjEwNzkyMzM5NH0.ZdybDhFSwadSzqpjmX5SSUPyzj7hwGTIUvmDs6egEQk';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
@@ -830,7 +830,7 @@ function settingsSheet(){
   const json=JSON.stringify({app:'aniar',v:1,products:S.products,events:S.events,invoices:S.invoices});
   openSheet(`<h3>تنظیمات و پشتیبان</h3><div class="stack">
     ${storageOK?'':'<div class="alert"><b>ذخیره‌سازی این مرورگر کار نمی‌کنه. حتماً پشتیبان بگیر.</b></div>'}
-    <p class="muted" style="font-size:13.5px">اطلاعات فقط روی همین گوشی ذخیره میشه. گاهی یه نسخه پشتیبان بگیر و جایی نگه دار.</p>
+    <p class="muted" style="font-size:13.5px">اطلاعات بعد از ورود، روی این گوشی و فضای ابری حساب تو ذخیره میشه. برای احتیاط گاهی یه نسخه پشتیبان هم بگیر.</p>
     <label class="f">پشتیبان (متن رو کپی کن)<textarea id="bk" readonly>${esc(json)}</textarea></label>
     <div class="actions"><button class="btn sm" data-act="bk-copy">کپی پشتیبان</button><button class="btn sm ghost" data-act="bk-dl">دانلود فایل</button></div>
     <label class="f">بازیابی (متن پشتیبان رو اینجا بچسبون)<textarea id="rs" placeholder="{...}"></textarea></label>
