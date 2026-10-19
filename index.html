@@ -969,23 +969,36 @@ async function bootstrapUser(user){
     cloudReady=true;hideAuth();render();toast('حساب متصل شد؛ اطلاعات با فضای ابری همگام است');
   }catch(err){console.error('Aniar cloud load failed:',err);cloudReady=false;showAuth('اتصال ابری ناموفق بود. ابتدا supabase/schema.sql را در SQL Editor اجرا کن. '+(err.message||''))}
 }
+function withRequestTimeout(promise,ms=15000){
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('درخواست بیش از ۱۵ ثانیه پاسخ نداد. اتصال اینترنت، آدرس Supabase و وضعیت پروژه را بررسی کن.')),ms)})
+  ]).finally(()=>clearTimeout(timer));
+}
 async function submitAuth(){
   const email=$('#auth-email').value.trim().toLowerCase(),password=$('#auth-password').value;
   if(!email||!$('#auth-email').checkValidity()){showAuth('ایمیل معتبر وارد کن.');return}
   if(password.length<6){showAuth('رمز عبور باید حداقل ۶ کاراکتر باشد.');return}
-  const button=$('#auth-submit');button.disabled=true;button.textContent='لطفاً صبر کن…';$('#auth-error').textContent='';
+  const button=$('#auth-submit');button.disabled=true;button.textContent='در حال اتصال…';$('#auth-error').textContent='';
   try{
     if(authMode==='signup'){
-      const {data,error}=await supabaseClient.auth.signUp({email,password});if(error)throw error;
+      const {data,error}=await withRequestTimeout(supabaseClient.auth.signUp({email,password}));if(error)throw error;
       if(!data.session){setAuthMode('signin');$('#auth-email').value=email;showAuth('حساب ساخته شد. اگر تأیید ایمیل در Supabase روشن است، ایمیلت را تأیید کن و بعد وارد شو.');return}
-      await bootstrapUser(data.user);
+      button.textContent='در حال بارگذاری اطلاعات…';
+      await withRequestTimeout(bootstrapUser(data.user));
     }else{
-      const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;await bootstrapUser(data.user);
+      const {data,error}=await withRequestTimeout(supabaseClient.auth.signInWithPassword({email,password}));if(error)throw error;
+      button.textContent='در حال بارگذاری اطلاعات…';
+      await withRequestTimeout(bootstrapUser(data.user));
     }
   }catch(err){
     const msg=String(err&&err.message||'خطای نامشخص');
     showAuth(msg.includes('Invalid login credentials')?'ایمیل یا رمز عبور اشتباه است.':msg.includes('Failed to fetch')?'اتصال اینترنت یا تنظیمات Supabase را بررسی کن.':msg);
-  }finally{button.disabled=false;setAuthMode(authMode)}
+  }finally{
+    button.disabled=false;
+    button.textContent=authMode==='signup'?'ساخت حساب':'ورود امن';
+  }
 }
 async function logout(){
   const {error}=await supabaseClient.auth.signOut();if(error){toast('خروج ناموفق بود',true);return}
