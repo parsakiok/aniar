@@ -660,7 +660,7 @@ function viewStock(v){
     const chip=st==='empty'?'<span class="chip empty">تمام شده</span>':st==='low'?'<span class="chip low">رو به اتمام</span>':'<span class="chip ok">موجود</span>';
     const est=m.stock>0&&ls.remain!=null?(ls.remain<1?'کمتر از ۱ روز':'حدود '+fdays(ls.remain)):'—';
     return`<article class="card prod ${st!=='ok'?'is-low':''}" data-act="openprod" data-id="${p.id}">
-      <div class="prod-top"><div><h3>${esc(p.name)}</h3><p class="sub">${num(p.cost)>0?'آخرین قیمت خرید '+money(p.cost)+' تومان':'بدون قیمت خرید'}</p></div>${chip}</div>
+      <div class="prod-top"><div><h3>${esc(p.name)}</h3><p class="sub">${categoryLabel(categoryFor(p))} · ${num(p.cost)>0?'آخرین قیمت خرید '+money(p.cost)+' تومان':'بدون قیمت خرید'}</p></div>${chip}</div>
       <div class="stock"><b class="num">${fa(m.stock)}</b><span>${esc(p.unit)}</span></div>
       <div class="life">
         <div><small>آخرین دوام</small><strong>${fdays(ls.last)}</strong></div>
