@@ -732,7 +732,7 @@ function productForm(p){
   openSheet(`<h3>${edit?'ویرایش کالا':'کالای جدید'}</h3><div class="stack">
     <label class="f">نام کالا<input id="pf-name" value="${esc(p?p.name:'')}" placeholder="مثلاً رب گوجه"></label>
     <div class="grid2">
-      <label class="f">دسته‌بندی<select id="pf-category">${[['count','تعداد'],['weight','وزن'],['volume','حجم']].map(([k,l])=>`<option value="${k}" ${categoryFor(p)===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">دسته‌بندی<select id="pf-category">${[['count','🔢 تعداد'],['weight','⚖️ وزن'],['volume','💧 حجم']].map(([k,l])=>`<option value="${k}" ${categoryFor(p)===k?'selected':''}>${l}</option>`).join('')}</select></label>
       <label class="f">واحد اصلی<select id="pf-unit">${(unitOptions[categoryFor(p)]||unitOptions.count).map(u=>`<option value="${u}" ${unitLabel(p?p.unit:'عدد')===u?'selected':''}>${u}</option>`).join('')}</select></label>
     </div>
     <div class="grid2">
