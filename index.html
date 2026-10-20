@@ -115,7 +115,11 @@ label.f>input{color:var(--fg)}
 .chip.buy{color:#e2c98a;border-color:#5b4c22}
 
 /* invoice */
-.line{display:flex;flex-direction:column;gap:10px}
+.line{display:flex;flex-direction:column;gap:10px;transition:border-color .18s,box-shadow .18s}
+.line.weight-line{border-color:var(--green-hi);box-shadow:inset 3px 0 0 var(--green)}
+.line.weight-line [data-role="qty-label"]{color:var(--accent)}
+.line.count-line [data-role="qty-label"]{color:var(--muted)}
+#pf-category,#pf-unit,#pf-init-unit{font-weight:700;background:var(--surface-2);border-color:var(--line)}
 .line-top{display:flex;gap:8px}
 .line-sum{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--muted)}
 .line-sum b{font-size:17px;color:var(--fg);font-weight:800}
@@ -624,7 +628,7 @@ function rowHTML(it,i){
     <div class="hint" data-role="hint"></div>
     <div class="grid2">
       <label class="f" data-role="price-label">${it.priceMode==='total'?'مبلغ کل این مقدار':`قیمت هر ${esc(priceUnit)}`} (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
-      <label class="f">مقدار<input inputmode="decimal" data-f="qty" placeholder="مثلاً ۲۰۰" value="${esc(it.qty)}"></label>
+      <label class="f" data-role="qty-label">مقدار<input inputmode="decimal" data-f="qty" placeholder="مثلاً ۱" value="${esc(it.qty)}"></label>
     </div>
     <label class="f">واحد مقدار<select data-f="unit">${units.map(u=>`<option value="${u}" ${u===selected?'selected':''}>${u}</option>`).join('')}</select></label>
     <label class="f">روش ورود قیمت<select data-f="priceMode"><option value="unit" ${it.priceMode!=='total'?'selected':''}>قیمت هر ${esc(priceUnit)}</option><option value="total" ${it.priceMode==='total'?'selected':''}>مبلغ کل این مقدار</option></select></label>
@@ -653,8 +657,12 @@ function updateTotals(){
     const priceLabel=row.querySelector('[data-role="price-label"]');
     const modeSel=row.querySelector('[data-f="priceMode"]');
     const kind=unitKind(unitSel?unitSel.value:it.unit),priceUnit=kind==='weight'?'کیلوگرم':kind==='volume'?'لیتر':(unitSel?unitSel.value:it.unit);
+    const qtyLabel=row.querySelector('[data-role="qty-label"]');
+    if(qtyLabel){qtyLabel.firstChild.textContent=kind==='weight'?'وزن خرید':kind==='volume'?'حجم خرید':'تعداد';const qinput=qtyLabel.querySelector('[data-f="qty"]');if(qinput)qinput.placeholder=kind==='weight'?'مثلاً ۲۰۰':kind==='volume'?'مثلاً ۵۰۰':'مثلاً ۱';}
     if(priceLabel)priceLabel.firstChild.textContent=(modeSel&&modeSel.value==='total'?'مبلغ کل این مقدار':'قیمت هر '+priceUnit)+' (تومان)';
     if(modeSel&&modeSel.options[0])modeSel.options[0].textContent='قیمت هر '+priceUnit;
+    row.classList.toggle('weight-line',kind==='weight');
+    row.classList.toggle('count-line',kind==='count');
     const equiv=row.querySelector('[data-role="equiv"]');
     if(equiv){const q=quantityInBase(it.qty,it.unit);equiv.textContent=it.priceMode==='total'&&q>0?'قیمت معادل هر '+priceUnit+': '+money(num(it.price)/q)+' تومان':'';}
     h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit+' · مقدار خرید به واحد اصلی تبدیل می‌شود':(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت با همین واحد به انبار اضافه می‌شود':'');
