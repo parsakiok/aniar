@@ -532,7 +532,7 @@ function addInvoice(inv){
       S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:stockQty,kind:'buy',invoiceId:inv.id,cost:ln.price});
       if(p&&ln.price>0){
         const effectivePrice=ln.priceMode==='total'?(quantityInBase(ln.qty,ln.unit)>0?num(ln.price)/quantityInBase(ln.qty,ln.unit):0):num(ln.price);
-        p.cost=convertUnitPrice(effectivePrice,unitKind(ln.unit)==='weight'?'کیلوگرم':unitKind(ln.unit)==='volume'?'لیتر':ln.unit,p.unit);
+        p.cost=convertUnitPrice(effectivePrice,unitKind(ln.unit)==='volume'?'لیتر':ln.unit,p.unit);
       }
     }
   }
@@ -796,7 +796,7 @@ function submitMove(id,kind){
 function loadSample(){
   const now=Date.now();
   const mk=(name,unit,cost,min)=>{const p={id:uid(),name,unit,price:0,cost,min};S.products.push(p);return p};
-  const rab=mk('رب گوجه','قوطی',68000,3),sh=mk('شکر','کیلو',52000,2),sir=mk('شیر','لیتر',28000,5),qh=mk('قهوه','کیلو',900000,1);
+  const rab=mk('رب گوجه','قوطی',68000,3),sh=mk('شکر','عدد',52000,2),sir=mk('شیر','لیتر',28000,5),qh=mk('قهوه','عدد',900000,1);
   const buy=(d,lines,invVal)=>addInvoice(makeInvoice(uid(),now-d*DAY,lines.map(([p,price,qty,dv])=>({name:p.name,pid:p.id,unit:p.unit,price,qty,dtype:'pct',dval:dv||0})),'pct',invVal||0,true));
   const use=(p,d,q)=>S.events.push({id:uid(),t:now-d*DAY,pid:p.id,delta:-q,kind:'use'});
   buy(34,[[rab,68000,10]]);use(rab,25,10);
