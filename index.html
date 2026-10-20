@@ -365,6 +365,22 @@ function convertQty(value,from,to){
   if(['میلی‌لیتر','لیتر'].includes(f)&&['میلی‌لیتر','لیتر'].includes(t))return r3(f==='میلی‌لیتر'?q/1000:q*1000);
   return q;
 }
+function convertUnitPrice(value,from,to){
+  const p=num(value),f=unitLabel(from),t=unitLabel(to);
+  if(f===t)return p;
+  if(['گرم','کیلوگرم'].includes(f)&&['گرم','کیلوگرم'].includes(t))return f==='گرم'?p*1000:p/1000;
+  if(['میلی‌لیتر','لیتر'].includes(f)&&['میلی‌لیتر','لیتر'].includes(t))return f==='میلی‌لیتر'?p*1000:p/1000;
+  return p;
+}
+function unitsForProduct(p){return unitOptions[categoryFor(p)]||[p&&p.unit||'عدد'];}
+function refreshInvoiceRowUnit(row,it,p){
+  const sel=row&&row.querySelector('[data-f="unit"]');if(!sel)return;
+  const units=p?unitsForProduct(p):[...unitOptions.count,...unitOptions.weight,...unitOptions.volume];
+  const chosen=unitLabel(it.unit||(p&&p.unit)||units[0]);
+  sel.innerHTML=units.map(u=>`<option value="${u}" ${u===chosen?'selected':''}>${u}</option>`).join('');
+  if(!units.includes(chosen)){it.unit=units[0];sel.value=units[0]}else it.unit=chosen;
+  const label=row.querySelector('[data-role="price-label"]');if(label)label.textContent='قیمت هر '+sel.value+' (تومان)';
+}
 const nf0=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
 const nf2=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2});
 const money=n=>nf0.format(Math.round(n||0));
@@ -402,7 +418,7 @@ const KEY='aniar.v1';
 let S={products:[],events:[],invoices:[],draft:null,editing:null,tab:'invoice',period:'7',day:null};
 let R={};
 let storageOK=true;
-function newItem(){return{id:uid(),name:'',pid:null,price:'',qty:'1',dtype:'pct',dval:''}}
+function newItem(){return{id:uid(),name:'',pid:null,unit:'',price:'',qty:'1',dtype:'pct',dval:''}}
 function newDraft(){return{type:'buy',items:[newItem()],invType:'pct',invVal:'',applyStock:true,ago:'0',origAgo:0}}
 function load(){
   try{
@@ -500,8 +516,10 @@ function addInvoice(inv){
   if(inv.applyStock){
     for(const ln of inv.items){
       if(!ln.pid)continue;
-      S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:ln.qty,kind:'buy',invoiceId:inv.id,cost:ln.price});
-      const p=S.products.find(x=>x.id===ln.pid);if(p&&ln.price>0)p.cost=ln.price;
+      const p=S.products.find(x=>x.id===ln.pid);
+      const stockQty=p?convertQty(ln.qty,ln.unit||p.unit,p.unit):ln.qty;
+      S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:stockQty,kind:'buy',invoiceId:inv.id,cost:ln.price});
+      if(p&&ln.price>0)p.cost=convertUnitPrice(ln.price,ln.unit||p.unit,p.unit);
     }
   }
 }
@@ -580,6 +598,7 @@ function viewInvoice(v){
   renderRows();
 }
 function rowHTML(it,i){
+  const p=findProduct(it.name),units=p?unitsForProduct(p):[...unitOptions.count,...unitOptions.weight,...unitOptions.volume],selected=unitLabel(it.unit||(p&&p.unit)||units[0]);
   return`<div class="card line" data-i="${i}">
     <div class="line-top">
       <input data-f="name" list="plist" placeholder="نام کالا" autocomplete="off" value="${esc(it.name)}" aria-label="نام کالا">
@@ -587,9 +606,10 @@ function rowHTML(it,i){
     </div>
     <div class="hint" data-role="hint"></div>
     <div class="grid2">
-      <label class="f">قیمت واحد (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
-      <label class="f">تعداد<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
+      <label class="f" data-role="price-label">قیمت هر ${esc(selected)} (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
+      <label class="f">مقدار<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
     </div>
+    <label class="f">واحد مقدار<select data-f="unit">${units.map(u=>`<option value="${u}" ${u===selected?'selected':''}>${u}</option>`).join('')}</select></label>
     <div class="disc-row">
       <label class="f">تخفیف این کالا<input inputmode="decimal" data-f="dval" placeholder="۰" value="${esc(it.dval)}"></label>
       <div class="seg mini" data-role="dseg"><button data-act="dtype" data-v="pct" class="${it.dtype==='pct'?'on':''}">٪</button><button data-act="dtype" data-v="amt" class="${it.dtype==='amt'?'on':''}">تومان</button></div>
@@ -610,7 +630,10 @@ function updateTotals(){
     row.querySelector('[data-role=ld]').textContent=l.disc>0?'(تخفیف '+money(l.disc)+')':'';
     const h=row.querySelector('[data-role=hint]');
     const p=findProduct(it.name);
-    h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit:(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت به انبار اضافه می‌شود':'');
+    const unitSel=row.querySelector('[data-f="unit"]');
+    const priceLabel=row.querySelector('[data-role="price-label"]');
+    if(priceLabel&&unitSel)priceLabel.textContent='قیمت هر '+unitSel.value+' (تومان)';
+    h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit+' · مقدار خرید به واحد اصلی تبدیل می‌شود':(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت با همین واحد به انبار اضافه می‌شود':'');
   });
   $('#t-sub').textContent=money(c.sub);
   $('#t-ld').textContent='− '+money(c.ld);$('#t-ld-r').hidden=c.ld<=0;
@@ -625,9 +648,10 @@ function saveInvoice(){
   const editing=!!S.editing;
   const t=draftTime();
   const raw=items.map(it=>{
+    const enteredUnit=unitLabel(it.unit||'عدد');
     let p=findProduct(it.name);
-    if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:'عدد',price:0,cost:num(it.price),min:0};S.products.push(p)}
-    return{...it,pid:p?p.id:null,unit:p?p.unit:''};
+    if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:enteredUnit,category:unitKind(enteredUnit),price:0,cost:num(it.price),min:0};S.products.push(p)}
+    return{...it,pid:p?p.id:null,unit:enteredUnit};
   });
   addInvoice(makeInvoice(editing?S.editing:uid(),t,raw,d.invType,d.invVal,d.applyStock));
   S.editing=null;S.draft=newDraft();saveNow();
@@ -640,7 +664,7 @@ function startEdit(id){
   const inv=S.invoices.find(i=>i.id===id);if(!inv)return;
   const ago=Math.max(0,Math.round((startOfDay(Date.now())-startOfDay(inv.t))/DAY));
   S.editing=id;
-  S.draft={type:'buy',items:inv.items.map(it=>({id:uid(),name:it.name,pid:it.pid,price:String(it.price),qty:String(it.qty),dtype:it.dtype||'pct',dval:it.dval?String(it.dval):''})),
+  S.draft={type:'buy',items:inv.items.map(it=>({id:uid(),name:it.name,pid:it.pid,unit:it.unit||((S.products.find(p=>p.id===it.pid)||{}).unit)||'عدد',price:String(it.price),qty:String(it.qty),dtype:it.dtype||'pct',dval:it.dval?String(it.dval):''})),
     invType:inv.invType||'pct',invVal:inv.invVal?String(inv.invVal):'',applyStock:inv.applyStock!==false,ago:String(ago),origAgo:ago};
   S.tab='invoice';saveNow();render();scrollTo(0,0);
 }
@@ -900,13 +924,21 @@ document.addEventListener('input',e=>{
     it[t.dataset.f]=t.value;
     if(t.dataset.f==='name'){
       const p=findProduct(t.value);it.pid=p?p.id:null;
-      if(p&&!num(it.price)&&num(p.cost)>0){it.price=String(p.cost);row.querySelector('[data-f=price]').value=p.cost}
+      if(p){
+        if(!it.unit||unitKind(it.unit)!==unitKind(p.unit))it.unit=p.unit;
+        refreshInvoiceRowUnit(row,it,p);
+        if(!num(it.price)&&num(p.cost)>0){it.price=String(convertUnitPrice(p.cost,p.unit,it.unit));row.querySelector('[data-f=price]').value=it.price}
+      }else{refreshInvoiceRowUnit(row,it,null)}
     }
   }
   updateTotals();save();
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='applyStock'){S.draft.applyStock=e.target.checked;updateTotals();save()}
+  if(e.target.matches('#rows [data-f="unit"]')){
+    const row=e.target.closest('[data-i]'),it=row&&S.draft.items[row.dataset.i];
+    if(it){it.unit=e.target.value;const l=row.querySelector('[data-role="price-label"]');if(l)l.textContent='قیمت هر '+it.unit+' (تومان)';updateTotals();save()}
+  }
   if(e.target.id==='pf-category'){
     const units=unitOptions[e.target.value]||unitOptions.count;
     const unit=$('#pf-unit'),initUnit=$('#pf-init-unit');
