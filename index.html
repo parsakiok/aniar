@@ -317,8 +317,7 @@ body.auth-required .top,body.auth-required #view,body.auth-required #nav,body.au
   </div>
   <button class="icon-btn" data-act="logout" aria-label="خروج از حساب" title="خروج از حساب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button>
   <button class="icon-btn" data-act="settings" aria-label="تنظیمات و پشتیبان"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
-
-  <button class="icon-btn theme-toggle" data-act="theme" aria-label="تغییر به حالت روشن" title="تغییر به حالت روشن"><svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42 1.42m11.3-11.3 1.42-1.42"/></svg></button>
+  <button class="icon-btn theme-toggle" data-act="theme" aria-label="تغییر به حالت روشن" title="تغییر به حالت روشن"><svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
 </header>
 
 <main id="view" class="stack"></main>
@@ -331,7 +330,7 @@ body.auth-required .top,body.auth-required #view,body.auth-required #nav,body.au
 </div>
 <div class="toast" id="toast" hidden></div>
 <datalist id="plist"></datalist>
-<datalist id="ulist"><option value="عدد"><option value="لیتر"><option value="بسته"><option value="قوطی"><option value="شیشه"><option value="کارتن"></datalist>
+<datalist id="ulist"><option value="عدد"><option value="کیلو"><option value="گرم"><option value="لیتر"><option value="بسته"><option value="قوطی"><option value="شیشه"><option value="کارتن"></datalist>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -353,32 +352,6 @@ function num(s){
     .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))
     .replace(/[٬,،\s]/g,'').replace(/٫/g,'.');
   const v=parseFloat(s);return isFinite(v)?v:0;
-}
-const unitLabel=u=>u;
-const unitKind=u=>['میلی‌لیتر','میلی لیتر','لیتر','ml','l'].includes(String(u||''))?'volume':'count';
-const unitOptions={count:['عدد','بسته','قوطی','شیشه','کارتن'],volume:['میلی‌لیتر','لیتر']};
-const categoryLabel=k=>({count:'تعداد',volume:'حجم'}[k]||'تعداد');
-const categoryFor=p=>p&&p.category&&unitOptions[p.category]?p.category:unitKind(p&&p.unit);
-function convertQty(value,from,to){
-  const q=num(value),f=unitLabel(from),t=unitLabel(to);
-  if(f===t)return r3(q);
-  if(['میلی‌لیتر','لیتر'].includes(f)&&['میلی‌لیتر','لیتر'].includes(t))return r3(f==='میلی‌لیتر'?q/1000:q*1000);
-  return q;
-}
-function convertUnitPrice(value,from,to){
-  const p=num(value),f=unitLabel(from),t=unitLabel(to);
-  if(f===t)return p;
-  if(['میلی‌لیتر','لیتر'].includes(f)&&['میلی‌لیتر','لیتر'].includes(t))return f==='میلی‌لیتر'?p*1000:p/1000;
-  return p;
-}
-function unitsForProduct(p){return unitOptions[categoryFor(p)]||[p&&p.unit||'عدد'];}
-function refreshInvoiceRowUnit(row,it,p){
-  const sel=row&&row.querySelector('[data-f="unit"]');if(!sel)return;
-  const units=p?unitsForProduct(p):[...unitOptions.count,...unitOptions.volume];
-  const chosen=unitLabel(it.unit||(p&&p.unit)||units[0]);
-  sel.innerHTML=units.map(u=>`<option value="${u}" ${u===chosen?'selected':''}>${u}</option>`).join('');
-  if(!units.includes(chosen)){it.unit=units[0];sel.value=units[0]}else it.unit=chosen;
-  const label=row.querySelector('[data-role="price-label"]');if(label)label.textContent='قیمت هر '+sel.value+' (تومان)';
 }
 const nf0=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
 const nf2=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2});
@@ -417,7 +390,7 @@ const KEY='aniar.v1';
 let S={products:[],events:[],invoices:[],draft:null,editing:null,tab:'invoice',period:'7',day:null};
 let R={};
 let storageOK=true;
-function newItem(){return{id:uid(),name:'',pid:null,unit:'',price:'',priceMode:'unit',qty:'1',dtype:'pct',dval:''}}
+function newItem(){return{id:uid(),name:'',pid:null,price:'',qty:'1',dtype:'pct',dval:''}}
 function newDraft(){return{type:'buy',items:[newItem()],invType:'pct',invVal:'',applyStock:true,ago:'0',origAgo:0}}
 function load(){
   try{
@@ -485,20 +458,8 @@ function status(p){
 const alerts=()=>S.products.filter(p=>status(p)!=='ok');
 
 /* ---------- purchase math ---------- */
-function quantityInBase(q,unit){
-  const u=unitLabel(unit);
-  if(u==='میلی‌لیتر')return num(q)/1000;
-  return num(q);
-}
-function pricePerBase(it){
-  const q=quantityInBase(it.qty,it.unit);
-  if(it.priceMode==='total')return q>0?num(it.price)/q:0;
-  if(it.priceMode==='legacy')return num(it.price);
-  return num(it.price);
-}
 function calcLine(it){
-  const q=quantityInBase(it.qty,it.unit);
-  const sub=Math.round(it.priceMode==='total'?num(it.price):num(it.price)*(it.priceMode==='legacy'?num(it.qty):q));
+  const sub=Math.round(num(it.price)*num(it.qty));
   let d=it.dtype==='pct'?sub*Math.min(100,Math.max(0,num(it.dval)))/100:num(it.dval);
   d=Math.round(Math.min(sub,Math.max(0,d)));
   return{sub,disc:d,total:sub-d};
@@ -515,7 +476,7 @@ function makeInvoice(id,t,raw,invType,invVal,applyStock){
   const c=calcInvoice({items:raw,invType,invVal});
   const items=raw.map(it=>{
     const l=calcLine(it);
-    return{pid:it.pid||null,name:String(it.name).trim(),unit:it.unit||'',price:num(it.price),priceMode:it.priceMode||'legacy',qty:num(it.qty),dtype:it.dtype||'pct',dval:num(it.dval),sub:l.sub,disc:l.disc,total:l.total};
+    return{pid:it.pid||null,name:String(it.name).trim(),unit:it.unit||'',price:num(it.price),qty:num(it.qty),dtype:it.dtype||'pct',dval:num(it.dval),sub:l.sub,disc:l.disc,total:l.total};
   });
   return{id,t,type:'buy',items,subtotal:c.sub,lineDisc:c.ld,invType,invVal:num(invVal),invDisc:c.idc,total:c.total,applyStock:!!applyStock};
 }
@@ -527,13 +488,8 @@ function addInvoice(inv){
   if(inv.applyStock){
     for(const ln of inv.items){
       if(!ln.pid)continue;
-      const p=S.products.find(x=>x.id===ln.pid);
-      const stockQty=p?convertQty(ln.qty,ln.unit||p.unit,p.unit):ln.qty;
-      S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:stockQty,kind:'buy',invoiceId:inv.id,cost:ln.price});
-      if(p&&ln.price>0){
-        const effectivePrice=ln.priceMode==='total'?(quantityInBase(ln.qty,ln.unit)>0?num(ln.price)/quantityInBase(ln.qty,ln.unit):0):num(ln.price);
-        p.cost=convertUnitPrice(effectivePrice,unitKind(ln.unit)==='volume'?'لیتر':ln.unit,p.unit);
-      }
+      S.events.push({id:uid(),t:inv.t,pid:ln.pid,delta:ln.qty,kind:'buy',invoiceId:inv.id,cost:ln.price});
+      const p=S.products.find(x=>x.id===ln.pid);if(p&&ln.price>0)p.cost=ln.price;
     }
   }
 }
@@ -612,7 +568,6 @@ function viewInvoice(v){
   renderRows();
 }
 function rowHTML(it,i){
-  const p=findProduct(it.name),units=p?unitsForProduct(p):[...unitOptions.count,...unitOptions.volume],selected=unitLabel(it.unit||(p&&p.unit)||units[0]),kind=unitKind(selected),priceUnit=kind==='volume'?'لیتر':selected;
   return`<div class="card line" data-i="${i}">
     <div class="line-top">
       <input data-f="name" list="plist" placeholder="نام کالا" autocomplete="off" value="${esc(it.name)}" aria-label="نام کالا">
@@ -620,17 +575,14 @@ function rowHTML(it,i){
     </div>
     <div class="hint" data-role="hint"></div>
     <div class="grid2">
-      <label class="f" data-role="price-label">${it.priceMode==='total'?'مبلغ کل این مقدار':`قیمت هر ${esc(priceUnit)}`} (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
-      <label class="f">مقدار<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
+      <label class="f">قیمت واحد (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
+      <label class="f">تعداد<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
     </div>
-    <label class="f">واحد مقدار<select data-f="unit">${units.map(u=>`<option value="${u}" ${u===selected?'selected':''}>${u}</option>`).join('')}</select></label>
-    <label class="f">روش ورود قیمت<select data-f="priceMode"><option value="unit" ${it.priceMode!=='total'?'selected':''}>قیمت هر ${esc(priceUnit)}</option><option value="total" ${it.priceMode==='total'?'selected':''}>مبلغ کل این مقدار</option></select></label>
     <div class="disc-row">
       <label class="f">تخفیف این کالا<input inputmode="decimal" data-f="dval" placeholder="۰" value="${esc(it.dval)}"></label>
       <div class="seg mini" data-role="dseg"><button data-act="dtype" data-v="pct" class="${it.dtype==='pct'?'on':''}">٪</button><button data-act="dtype" data-v="amt" class="${it.dtype==='amt'?'on':''}">تومان</button></div>
     </div>
-    <div class="hint" data-role="equiv"></div>
-    <div class="line-sum"><span>مبلغ این کالا <span class="ld num" data-role="ld"></span></span><b class="num" data-role="lt">۰</b></div>
+    <div class="line-sum"><span>قیمت کالا <span class="ld num" data-role="ld"></span></span><b class="num" data-role="lt">۰</b></div>
   </div>`;
 }
 function renderRows(){
@@ -646,14 +598,7 @@ function updateTotals(){
     row.querySelector('[data-role=ld]').textContent=l.disc>0?'(تخفیف '+money(l.disc)+')':'';
     const h=row.querySelector('[data-role=hint]');
     const p=findProduct(it.name);
-    const unitSel=row.querySelector('[data-f="unit"]');
-    const priceLabel=row.querySelector('[data-role="price-label"]');
-    const modeSel=row.querySelector('[data-f="priceMode"]');
-    const kind=unitKind(unitSel?unitSel.value:it.unit),priceUnit=kind==='volume'?'لیتر':(unitSel?unitSel.value:it.unit);
-    if(priceLabel)priceLabel.textContent=(modeSel&&modeSel.value==='total'?'مبلغ کل این مقدار':'قیمت هر '+priceUnit)+' (تومان)';
-    const equiv=row.querySelector('[data-role="equiv"]');
-    if(equiv){const q=quantityInBase(it.qty,it.unit);equiv.textContent=it.priceMode==='total'&&q>0?'قیمت معادل هر '+priceUnit+': '+money(num(it.price)/q)+' تومان':'';}
-    h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit+' · مقدار خرید به واحد اصلی تبدیل می‌شود':(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت با همین واحد به انبار اضافه می‌شود':'');
+    h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit:(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت به انبار اضافه می‌شود':'');
   });
   $('#t-sub').textContent=money(c.sub);
   $('#t-ld').textContent='− '+money(c.ld);$('#t-ld-r').hidden=c.ld<=0;
@@ -669,9 +614,8 @@ function saveInvoice(){
   const t=draftTime();
   const raw=items.map(it=>{
     let p=findProduct(it.name);
-    const enteredUnit=unitLabel(it.unit||(p&&p.unit)||'عدد');
-    if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:enteredUnit,category:unitKind(enteredUnit),price:0,cost:num(it.price),min:0};S.products.push(p)}
-    return{...it,pid:p?p.id:null,unit:enteredUnit};
+    if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:'عدد',price:0,cost:num(it.price),min:0};S.products.push(p)}
+    return{...it,pid:p?p.id:null,unit:p?p.unit:''};
   });
   addInvoice(makeInvoice(editing?S.editing:uid(),t,raw,d.invType,d.invVal,d.applyStock));
   S.editing=null;S.draft=newDraft();saveNow();
@@ -684,7 +628,7 @@ function startEdit(id){
   const inv=S.invoices.find(i=>i.id===id);if(!inv)return;
   const ago=Math.max(0,Math.round((startOfDay(Date.now())-startOfDay(inv.t))/DAY));
   S.editing=id;
-  S.draft={type:'buy',items:inv.items.map(it=>({id:uid(),name:it.name,pid:it.pid,unit:it.unit||((S.products.find(p=>p.id===it.pid)||{}).unit)||'عدد',price:String(it.price),priceMode:it.priceMode||'legacy',qty:String(it.qty),dtype:it.dtype||'pct',dval:it.dval?String(it.dval):''})),
+  S.draft={type:'buy',items:inv.items.map(it=>({id:uid(),name:it.name,pid:it.pid,price:String(it.price),qty:String(it.qty),dtype:it.dtype||'pct',dval:it.dval?String(it.dval):''})),
     invType:inv.invType||'pct',invVal:inv.invVal?String(inv.invVal):'',applyStock:inv.applyStock!==false,ago:String(ago),origAgo:ago};
   S.tab='invoice';saveNow();render();scrollTo(0,0);
 }
@@ -704,7 +648,7 @@ function viewStock(v){
     const chip=st==='empty'?'<span class="chip empty">تمام شده</span>':st==='low'?'<span class="chip low">رو به اتمام</span>':'<span class="chip ok">موجود</span>';
     const est=m.stock>0&&ls.remain!=null?(ls.remain<1?'کمتر از ۱ روز':'حدود '+fdays(ls.remain)):'—';
     return`<article class="card prod ${st!=='ok'?'is-low':''}" data-act="openprod" data-id="${p.id}">
-      <div class="prod-top"><div><h3>${esc(p.name)}</h3><p class="sub">${categoryLabel(categoryFor(p))} · ${num(p.cost)>0?'آخرین قیمت خرید '+money(p.cost)+' تومان':'بدون قیمت خرید'}</p></div>${chip}</div>
+      <div class="prod-top"><div><h3>${esc(p.name)}</h3><p class="sub">${num(p.cost)>0?'آخرین قیمت خرید '+money(p.cost)+' تومان':'بدون قیمت خرید'}</p></div>${chip}</div>
       <div class="stock"><b class="num">${fa(m.stock)}</b><span>${esc(p.unit)}</span></div>
       <div class="life">
         <div><small>آخرین دوام</small><strong>${fdays(ls.last)}</strong></div>
@@ -720,17 +664,13 @@ function productForm(p){
   openSheet(`<h3>${edit?'ویرایش کالا':'کالای جدید'}</h3><div class="stack">
     <label class="f">نام کالا<input id="pf-name" value="${esc(p?p.name:'')}" placeholder="مثلاً رب گوجه"></label>
     <div class="grid2">
-      <label class="f">دسته‌بندی<select id="pf-category">${[['count','تعداد'],['volume','حجم']].map(([k,l])=>`<option value="${k}" ${categoryFor(p)===k?'selected':''}>${l}</option>`).join('')}</select></label>
-      <label class="f">واحد اصلی<select id="pf-unit">${(unitOptions[categoryFor(p)]||unitOptions.count).map(u=>`<option value="${u}" ${unitLabel(p?p.unit:'عدد')===u?'selected':''}>${u}</option>`).join('')}</select></label>
+      <label class="f">واحد<input id="pf-unit" list="ulist" value="${esc(p?p.unit:'عدد')}"></label>
+      <label class="f">قیمت خرید (تومان)<input id="pf-cost" inputmode="decimal" value="${p&&p.cost?esc(p.cost):''}" placeholder="۰"></label>
     </div>
     <div class="grid2">
-      <label class="f">قیمت خرید (تومان)<input id="pf-cost" inputmode="decimal" value="${p&&p.cost?esc(p.cost):''}" placeholder="۰"></label>
       <label class="f">هشدار وقتی کمتر شد از<input id="pf-min" inputmode="decimal" value="${p&&p.min?esc(p.min):''}" placeholder="۰"></label>
+      ${edit?'':'<label class="f">موجودی فعلی<input id="pf-init" inputmode="decimal" placeholder="۰"></label>'}
     </div>
-    ${edit?'':`<div class="grid2">
-      <label class="f">موجودی اولیه<input id="pf-init" inputmode="decimal" placeholder="۰"></label>
-      <label class="f">واحد مقدار اولیه<select id="pf-init-unit">${(unitOptions[categoryFor(p)]||unitOptions.count).map(u=>`<option value="${u}" ${unitLabel(p?p.unit:'عدد')===u?'selected':''}>${u}</option>`).join('')}</select></label>
-    </div>`}
     <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-prod" data-id="${p?p.id:''}">ذخیره</button></div>
   </div>`);
 }
@@ -739,16 +679,12 @@ function submitProduct(id){
   if(!name){toast('اسم کالا رو بنویس',true);return}
   const dup=findProduct(name);
   if(dup&&dup.id!==id){toast('این کالا قبلاً توی انبار هست',true);return}
-  const category=$('#pf-category').value,unit=$('#pf-unit').value;
-  const old=id?S.products.find(p=>p.id===id):null;
-  if(old&&unitKind(old.unit)!==unitKind(unit)){toast('برای حفظ سوابق، دسته‌بندی و واحد اصلی کالای موجود را تغییر نده؛ کالای جدید بساز',true);return}
-  const data={name,category,unit,min:num($('#pf-min').value),cost:num($('#pf-cost').value)};
-  if(id){Object.assign(old,data)}
+  const data={name,unit:$('#pf-unit').value.trim()||'عدد',min:num($('#pf-min').value),cost:num($('#pf-cost').value)};
+  if(id){Object.assign(S.products.find(p=>p.id===id),data)}
   else{
     const p={id:uid(),price:0,...data};S.products.push(p);
-    const init=num($('#pf-init').value),initUnit=$('#pf-init-unit').value;
-    const converted=convertQty(init,initUnit,unit);
-    if(converted>0)S.events.push({id:uid(),t:Date.now(),pid:p.id,delta:converted,kind:'init'});
+    const init=num($('#pf-init').value);
+    if(init>0)S.events.push({id:uid(),t:Date.now(),pid:p.id,delta:init,kind:'init'});
   }
   saveNow();closeSheet();render();toast('ذخیره شد');
 }
@@ -768,22 +704,19 @@ function productSheet(id){
 function moveSheet(id,kind){
   const p=S.products.find(x=>x.id===id);if(!p)return;
   const buy=kind==='buy';
-  const units=unitOptions[categoryFor(p)]||[p.unit];
   openSheet(`<h3>${buy?'خرید جدید':'ثبت مصرف'} · ${esc(p.name)}</h3><div class="stack">
-    <div class="grid2"><label class="f">مقدار<input id="mv-qty" inputmode="decimal" placeholder="مثلاً ۲۵۰"></label>
-    <label class="f">واحد مقدار<select id="mv-unit">${units.map(u=>`<option value="${u}" ${unitLabel(p.unit)===u?'selected':''}>${u}</option>`).join('')}</select></label></div>
+    <label class="f">مقدار (${esc(p.unit)})<input id="mv-qty" inputmode="decimal" placeholder="۰"></label>
     ${buy?`<label class="f">قیمت خرید هر ${esc(p.unit)} (تومان)<input id="mv-cost" inputmode="decimal" value="${p.cost?esc(p.cost):''}" placeholder="۰"></label>`:''}
-    <p class="hint">مقدار به واحد اصلی کالا یعنی ${esc(unitLabel(p.unit))} تبدیل می‌شود.</p>
     <label class="f">چند روز پیش؟ (۰ یعنی امروز)<input id="mv-ago" inputmode="numeric" value="0"></label>
     <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-move" data-id="${id}" data-kind="${kind}">ثبت</button></div>
   </div>`);
 }
 function submitMove(id,kind){
-  const p=S.products.find(x=>x.id===id);if(!p)return;
-  const entered=num($('#mv-qty').value),from=$('#mv-unit').value,q=convertQty(entered,from,p.unit);
-  if(entered<=0||q<=0){toast('مقدار رو درست وارد کن',true);return}
+  const q=num($('#mv-qty').value);
+  if(q<=0){toast('مقدار رو وارد کن',true);return}
   const ago=Math.max(0,num($('#mv-ago').value));
   const t=Date.now()-ago*DAY;
+  const p=S.products.find(x=>x.id===id);
   if(kind==='buy'){
     /* a restock is recorded as a normal purchase so it shows in the purchase list */
     const cost=num($('#mv-cost').value);
@@ -796,7 +729,7 @@ function submitMove(id,kind){
 function loadSample(){
   const now=Date.now();
   const mk=(name,unit,cost,min)=>{const p={id:uid(),name,unit,price:0,cost,min};S.products.push(p);return p};
-  const rab=mk('رب گوجه','قوطی',68000,3),sh=mk('شکر','عدد',52000,2),sir=mk('شیر','لیتر',28000,5),qh=mk('قهوه','عدد',900000,1);
+  const rab=mk('رب گوجه','قوطی',68000,3),sh=mk('شکر','کیلو',52000,2),sir=mk('شیر','لیتر',28000,5),qh=mk('قهوه','کیلو',900000,1);
   const buy=(d,lines,invVal)=>addInvoice(makeInvoice(uid(),now-d*DAY,lines.map(([p,price,qty,dv])=>({name:p.name,pid:p.id,unit:p.unit,price,qty,dtype:'pct',dval:dv||0})),'pct',invVal||0,true));
   const use=(p,d,q)=>S.events.push({id:uid(),t:now-d*DAY,pid:p.id,delta:-q,kind:'use'});
   buy(34,[[rab,68000,10]]);use(rab,25,10);
@@ -865,8 +798,7 @@ function viewHistory(v){
 function purchaseCard(inv){
   const items=inv.items.map(it=>{
     const dtxt=it.disc>0?`<span class="disc num">تخفیف ${it.dtype==='pct'&&it.dval?fa(it.dval)+'٪ ':''}(− ${money(it.disc)})</span>`:'';
-    const detail=it.priceMode==='total'?`${fa(it.qty)} ${esc(it.unit||'')} · مبلغ کل ${money(it.price)}`:`${fa(it.qty)} ${esc(it.unit||'')} × ${money(it.price)}`;
-    return`<div class="pit"><div class="pit-main"><b>${esc(it.name)}</b><span class="num">${detail}</span>${dtxt}</div><b class="pit-tot num">${money(it.total)}</b></div>`;
+    return`<div class="pit"><div class="pit-main"><b>${esc(it.name)}</b><span class="num">${fa(it.qty)} ${esc(it.unit||'')} × ${money(it.price)}</span>${dtxt}</div><b class="pit-tot num">${money(it.total)}</b></div>`;
   }).join('');
   return`<article class="card pur">
     <div class="pur-top"><span class="muted num">ساعت ${jTime.format(inv.t)}</span>
@@ -945,39 +877,19 @@ document.addEventListener('input',e=>{
     it[t.dataset.f]=t.value;
     if(t.dataset.f==='name'){
       const p=findProduct(t.value);it.pid=p?p.id:null;
-      if(p){
-        if(!it.unit||unitKind(it.unit)!==unitKind(p.unit))it.unit=p.unit;
-        refreshInvoiceRowUnit(row,it,p);
-        if(!num(it.price)&&num(p.cost)>0){it.price=String(convertUnitPrice(p.cost,p.unit,it.unit));row.querySelector('[data-f=price]').value=it.price}
-      }else{refreshInvoiceRowUnit(row,it,null)}
+      if(p&&!num(it.price)&&num(p.cost)>0){it.price=String(p.cost);row.querySelector('[data-f=price]').value=p.cost}
     }
   }
   updateTotals();save();
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='applyStock'){S.draft.applyStock=e.target.checked;updateTotals();save()}
-  if(e.target.matches('#rows [data-f="unit"]')||e.target.matches('#rows [data-f="priceMode"]')){
-    const row=e.target.closest('[data-i]'),it=row&&S.draft.items[row.dataset.i];
-    if(it){
-      if(e.target.dataset.f==='unit')it.unit=e.target.value;else it.priceMode=e.target.value;
-      const l=row.querySelector('[data-role="price-label"]'),kind=unitKind(it.unit),pu=kind==='volume'?'لیتر':it.unit;
-      if(l)l.textContent=(it.priceMode==='total'?'مبلغ کل این مقدار':'قیمت هر '+pu)+' (تومان)';
-      updateTotals();save()
-    }
-  }
-  if(e.target.id==='pf-category'){
-    const units=unitOptions[e.target.value]||unitOptions.count;
-    const unit=$('#pf-unit'),initUnit=$('#pf-init-unit');
-    if(unit){unit.innerHTML=units.map(u=>`<option value="${u}">${u}</option>`).join('');unit.value=units[0]}
-    if(initUnit){initUnit.innerHTML=units.map(u=>`<option value="${u}">${u}</option>`).join('');initUnit.value=units[0]}
-  }
 });
 document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-act]');if(!el)return;
   const a=el.dataset.act,id=el.dataset.id,v=el.dataset.v;
   const row=el.closest('[data-i]'),it=row?S.draft.items[row.dataset.i]:null;
   switch(a){
-
     case'theme':toggleTheme();break;
     case'tab':S.tab=v;render();scrollTo(0,0);break;
     case'itype':S.draft.invType=v;setSeg($('#invSeg'),v);updateTotals();save();break;
@@ -1124,7 +1036,7 @@ function applyTheme(theme){
     b.title=light?'تغییر به حالت تیره':'تغییر به حالت روشن';
     b.innerHTML=light
       ? '<svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>'
-      : '<svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l-1.42 1.42m11.3-11.3 1.42-1.42"/></svg>';
+      : '<svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>';
   }
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta)meta.content=light?'#f4f6f3':'#0b0d0b';
