@@ -648,8 +648,8 @@ function saveInvoice(){
   const editing=!!S.editing;
   const t=draftTime();
   const raw=items.map(it=>{
-    const enteredUnit=unitLabel(it.unit||'عدد');
     let p=findProduct(it.name);
+    const enteredUnit=unitLabel(it.unit||(p&&p.unit)||'عدد');
     if(!p&&d.applyStock){p={id:uid(),name:it.name.trim(),unit:enteredUnit,category:unitKind(enteredUnit),price:0,cost:num(it.price),min:0};S.products.push(p)}
     return{...it,pid:p?p.id:null,unit:enteredUnit};
   });
