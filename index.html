@@ -379,7 +379,9 @@ function refreshInvoiceRowUnit(row,it,p){
   const chosen=unitLabel(it.unit||(p&&p.unit)||units[0]);
   sel.innerHTML=units.map(u=>`<option value="${u}" ${u===chosen?'selected':''}>${u}</option>`).join('');
   if(!units.includes(chosen)){it.unit=units[0];sel.value=units[0]}else it.unit=chosen;
-  const label=row.querySelector('[data-role="price-label"]');if(label)label.textContent='قیمت هر '+sel.value+' (تومان)';
+  const kind=unitKind(sel.value),priceUnit=kind==='weight'?'کیلوگرم':kind==='volume'?'لیتر':sel.value;
+  const label=row.querySelector('[data-role="price-label"]');if(label)label.firstChild.textContent='قیمت هر '+priceUnit+' (تومان)';
+  const mode=row.querySelector('[data-f="priceMode"]');if(mode&&mode.options[0])mode.options[0].textContent='قیمت هر '+priceUnit;
 }
 const nf0=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
 const nf2=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2});
@@ -622,7 +624,7 @@ function rowHTML(it,i){
     <div class="hint" data-role="hint"></div>
     <div class="grid2">
       <label class="f" data-role="price-label">${it.priceMode==='total'?'مبلغ کل این مقدار':`قیمت هر ${esc(priceUnit)}`} (تومان)<input inputmode="decimal" data-f="price" placeholder="۰" value="${esc(it.price)}"></label>
-      <label class="f">مقدار<div class="stepper"><button data-act="dec" aria-label="کم کردن">−</button><input inputmode="decimal" data-f="qty" value="${esc(it.qty)}"><button data-act="inc" aria-label="زیاد کردن">+</button></div></label>
+      <label class="f">مقدار<input inputmode="decimal" data-f="qty" placeholder="مثلاً ۲۰۰" value="${esc(it.qty)}"></label>
     </div>
     <label class="f">واحد مقدار<select data-f="unit">${units.map(u=>`<option value="${u}" ${u===selected?'selected':''}>${u}</option>`).join('')}</select></label>
     <label class="f">روش ورود قیمت<select data-f="priceMode"><option value="unit" ${it.priceMode!=='total'?'selected':''}>قیمت هر ${esc(priceUnit)}</option><option value="total" ${it.priceMode==='total'?'selected':''}>مبلغ کل این مقدار</option></select></label>
@@ -651,7 +653,8 @@ function updateTotals(){
     const priceLabel=row.querySelector('[data-role="price-label"]');
     const modeSel=row.querySelector('[data-f="priceMode"]');
     const kind=unitKind(unitSel?unitSel.value:it.unit),priceUnit=kind==='weight'?'کیلوگرم':kind==='volume'?'لیتر':(unitSel?unitSel.value:it.unit);
-    if(priceLabel)priceLabel.textContent=(modeSel&&modeSel.value==='total'?'مبلغ کل این مقدار':'قیمت هر '+priceUnit)+' (تومان)';
+    if(priceLabel)priceLabel.firstChild.textContent=(modeSel&&modeSel.value==='total'?'مبلغ کل این مقدار':'قیمت هر '+priceUnit)+' (تومان)';
+    if(modeSel&&modeSel.options[0])modeSel.options[0].textContent='قیمت هر '+priceUnit;
     const equiv=row.querySelector('[data-role="equiv"]');
     if(equiv){const q=quantityInBase(it.qty,it.unit);equiv.textContent=it.priceMode==='total'&&q>0?'قیمت معادل هر '+priceUnit+': '+money(num(it.price)/q)+' تومان':'';}
     h.textContent=p?'موجودی فعلی انبار: '+fa((R[p.id]||{stock:0}).stock)+' '+p.unit+' · مقدار خرید به واحد اصلی تبدیل می‌شود':(norm(it.name)&&d.applyStock?'کالای جدید است و موقع ثبت با همین واحد به انبار اضافه می‌شود':'');
@@ -866,7 +869,10 @@ function viewHistory(v){
 function purchaseCard(inv){
   const items=inv.items.map(it=>{
     const dtxt=it.disc>0?`<span class="disc num">تخفیف ${it.dtype==='pct'&&it.dval?fa(it.dval)+'٪ ':''}(− ${money(it.disc)})</span>`:'';
-    const detail=it.priceMode==='total'?`${fa(it.qty)} ${esc(it.unit||'')} · مبلغ کل ${money(it.price)}`:`${fa(it.qty)} ${esc(it.unit||'')} × ${money(it.price)}${it.priceMode==='unit'&&unitKind(it.unit)==='weight'?' / کیلوگرم':''}`;
+    const kind=unitKind(it.unit),priceUnit=kind==='weight'?'کیلوگرم':kind==='volume'?'لیتر':(it.unit||'عدد');
+    const detail=it.priceMode==='total'
+      ?`${fa(it.qty)} ${esc(it.unit||'')} · مبلغ این مقدار: ${money(it.price)} تومان`
+      :`${fa(it.qty)} ${esc(it.unit||'')} · قیمت هر ${esc(priceUnit)}: ${money(it.price)} تومان`;
     return`<div class="pit"><div class="pit-main"><b>${esc(it.name)}</b><span class="num">${detail}</span>${dtxt}</div><b class="pit-tot num">${money(it.total)}</b></div>`;
   }).join('');
   return`<article class="card pur">
