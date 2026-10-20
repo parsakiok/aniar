@@ -353,6 +353,18 @@ function num(s){
     .replace(/[٬,،\s]/g,'').replace(/٫/g,'.');
   const v=parseFloat(s);return isFinite(v)?v:0;
 }
+const unitLabel=u=>u==='کیلو'?'کیلوگرم':u;
+const unitKind=u=>['گرم','کیلو','کیلوگرم','g','kg'].includes(String(u||''))?'weight':['میلی‌لیتر','میلی لیتر','لیتر','ml','l'].includes(String(u||''))?'volume':'count';
+const unitOptions={count:['عدد','بسته','قوطی','شیشه','کارتن'],weight:['گرم','کیلوگرم'],volume:['میلی‌لیتر','لیتر']};
+const categoryLabel=k=>({count:'تعداد',weight:'وزن',volume:'حجم'}[k]||'تعداد');
+const categoryFor=p=>p&&p.category&&unitOptions[p.category]?p.category:unitKind(p&&p.unit);
+function convertQty(value,from,to){
+  const q=num(value),f=unitLabel(from),t=unitLabel(to);
+  if(f===t)return r3(q);
+  if(['گرم','کیلوگرم'].includes(f)&&['گرم','کیلوگرم'].includes(t))return r3(f==='گرم'?q/1000:q*1000);
+  if(['میلی‌لیتر','لیتر'].includes(f)&&['میلی‌لیتر','لیتر'].includes(t))return r3(f==='میلی‌لیتر'?q/1000:q*1000);
+  return q;
+}
 const nf0=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:0});
 const nf2=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:2});
 const money=n=>nf0.format(Math.round(n||0));
@@ -664,13 +676,17 @@ function productForm(p){
   openSheet(`<h3>${edit?'ویرایش کالا':'کالای جدید'}</h3><div class="stack">
     <label class="f">نام کالا<input id="pf-name" value="${esc(p?p.name:'')}" placeholder="مثلاً رب گوجه"></label>
     <div class="grid2">
-      <label class="f">واحد<input id="pf-unit" list="ulist" value="${esc(p?p.unit:'عدد')}"></label>
-      <label class="f">قیمت خرید (تومان)<input id="pf-cost" inputmode="decimal" value="${p&&p.cost?esc(p.cost):''}" placeholder="۰"></label>
+      <label class="f">دسته‌بندی<select id="pf-category">${[['count','تعداد'],['weight','وزن'],['volume','حجم']].map(([k,l])=>`<option value="${k}" ${categoryFor(p)===k?'selected':''}>${l}</option>`).join('')}</select></label>
+      <label class="f">واحد اصلی<select id="pf-unit">${(unitOptions[categoryFor(p)]||unitOptions.count).map(u=>`<option value="${u}" ${unitLabel(p?p.unit:'عدد')===u?'selected':''}>${u}</option>`).join('')}</select></label>
     </div>
     <div class="grid2">
+      <label class="f">قیمت خرید (تومان)<input id="pf-cost" inputmode="decimal" value="${p&&p.cost?esc(p.cost):''}" placeholder="۰"></label>
       <label class="f">هشدار وقتی کمتر شد از<input id="pf-min" inputmode="decimal" value="${p&&p.min?esc(p.min):''}" placeholder="۰"></label>
-      ${edit?'':'<label class="f">موجودی فعلی<input id="pf-init" inputmode="decimal" placeholder="۰"></label>'}
     </div>
+    ${edit?'':`<div class="grid2">
+      <label class="f">موجودی اولیه<input id="pf-init" inputmode="decimal" placeholder="۰"></label>
+      <label class="f">واحد مقدار اولیه<select id="pf-init-unit">${(unitOptions[categoryFor(p)]||unitOptions.count).map(u=>`<option value="${u}" ${unitLabel(p?p.unit:'عدد')===u?'selected':''}>${u}</option>`).join('')}</select></label>
+    </div>`}
     <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-prod" data-id="${p?p.id:''}">ذخیره</button></div>
   </div>`);
 }
@@ -679,12 +695,16 @@ function submitProduct(id){
   if(!name){toast('اسم کالا رو بنویس',true);return}
   const dup=findProduct(name);
   if(dup&&dup.id!==id){toast('این کالا قبلاً توی انبار هست',true);return}
-  const data={name,unit:$('#pf-unit').value.trim()||'عدد',min:num($('#pf-min').value),cost:num($('#pf-cost').value)};
-  if(id){Object.assign(S.products.find(p=>p.id===id),data)}
+  const category=$('#pf-category').value,unit=$('#pf-unit').value;
+  const old=id?S.products.find(p=>p.id===id):null;
+  if(old&&unitKind(old.unit)!==unitKind(unit)){toast('برای حفظ سوابق، دسته‌بندی و واحد اصلی کالای موجود را تغییر نده؛ کالای جدید بساز',true);return}
+  const data={name,category,unit,min:num($('#pf-min').value),cost:num($('#pf-cost').value)};
+  if(id){Object.assign(old,data)}
   else{
     const p={id:uid(),price:0,...data};S.products.push(p);
-    const init=num($('#pf-init').value);
-    if(init>0)S.events.push({id:uid(),t:Date.now(),pid:p.id,delta:init,kind:'init'});
+    const init=num($('#pf-init').value),initUnit=$('#pf-init-unit').value;
+    const converted=convertQty(init,initUnit,unit);
+    if(converted>0)S.events.push({id:uid(),t:Date.now(),pid:p.id,delta:converted,kind:'init'});
   }
   saveNow();closeSheet();render();toast('ذخیره شد');
 }
@@ -704,19 +724,22 @@ function productSheet(id){
 function moveSheet(id,kind){
   const p=S.products.find(x=>x.id===id);if(!p)return;
   const buy=kind==='buy';
+  const units=unitOptions[categoryFor(p)]||[p.unit];
   openSheet(`<h3>${buy?'خرید جدید':'ثبت مصرف'} · ${esc(p.name)}</h3><div class="stack">
-    <label class="f">مقدار (${esc(p.unit)})<input id="mv-qty" inputmode="decimal" placeholder="۰"></label>
+    <div class="grid2"><label class="f">مقدار<input id="mv-qty" inputmode="decimal" placeholder="مثلاً ۲۵۰"></label>
+    <label class="f">واحد مقدار<select id="mv-unit">${units.map(u=>`<option value="${u}" ${unitLabel(p.unit)===u?'selected':''}>${u}</option>`).join('')}</select></label></div>
     ${buy?`<label class="f">قیمت خرید هر ${esc(p.unit)} (تومان)<input id="mv-cost" inputmode="decimal" value="${p.cost?esc(p.cost):''}" placeholder="۰"></label>`:''}
+    <p class="hint">مقدار به واحد اصلی کالا یعنی ${esc(unitLabel(p.unit))} تبدیل می‌شود.</p>
     <label class="f">چند روز پیش؟ (۰ یعنی امروز)<input id="mv-ago" inputmode="numeric" value="0"></label>
     <div class="actions"><button class="btn ghost" data-act="closesheet">انصراف</button><button class="btn grow" data-act="submit-move" data-id="${id}" data-kind="${kind}">ثبت</button></div>
   </div>`);
 }
 function submitMove(id,kind){
-  const q=num($('#mv-qty').value);
-  if(q<=0){toast('مقدار رو وارد کن',true);return}
+  const p=S.products.find(x=>x.id===id);if(!p)return;
+  const entered=num($('#mv-qty').value),from=$('#mv-unit').value,q=convertQty(entered,from,p.unit);
+  if(entered<=0||q<=0){toast('مقدار رو درست وارد کن',true);return}
   const ago=Math.max(0,num($('#mv-ago').value));
   const t=Date.now()-ago*DAY;
-  const p=S.products.find(x=>x.id===id);
   if(kind==='buy'){
     /* a restock is recorded as a normal purchase so it shows in the purchase list */
     const cost=num($('#mv-cost').value);
@@ -884,6 +907,12 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='applyStock'){S.draft.applyStock=e.target.checked;updateTotals();save()}
+  if(e.target.id==='pf-category'){
+    const units=unitOptions[e.target.value]||unitOptions.count;
+    const unit=$('#pf-unit'),initUnit=$('#pf-init-unit');
+    if(unit){unit.innerHTML=units.map(u=>`<option value="${u}">${u}</option>`).join('');unit.value=units[0]}
+    if(initUnit){initUnit.innerHTML=units.map(u=>`<option value="${u}">${u}</option>`).join('');initUnit.value=units[0]}
+  }
 });
 document.addEventListener('click',async e=>{
   const el=e.target.closest('[data-act]');if(!el)return;
