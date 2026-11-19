@@ -520,12 +520,20 @@ function setSeg(box,val){box.querySelectorAll('button').forEach(b=>b.classList.t
 
 /* ---------- rendering ---------- */
 function render(){
-  R=replay();
-  $('#today').textContent=jFull.format(Date.now());
-  $('#plist').innerHTML=S.products.map(p=>`<option value="${esc(p.name)}">`).join('');
-  renderNav();
   const v=$('#view');
-  ({invoice:viewInvoice,stock:viewStock,history:viewHistory,report:viewReport})[S.tab](v);
+  try{
+    R=replay();
+    $('#today').textContent=jFull.format(Date.now());
+    $('#plist').innerHTML=S.products.map(p=>`<option value="${esc(p.name)}">`).join('');
+    renderNav();
+    const views={invoice:viewInvoice,stock:viewStock,history:viewHistory,report:viewReport};
+    if(!views[S.tab])S.tab='invoice';
+    views[S.tab](v);
+  }catch(err){
+    console.error('Aniar render failed:',err);
+    renderNav();
+    v.innerHTML=`<div class="card empty"><h3>نمایش برنامه با خطا روبه‌رو شد</h3><p>اطلاعاتت حذف نشده. صفحه را دوباره بارگذاری کن؛ اگر خطا ادامه داشت، از تنظیمات/بکاپ استفاده کن.</p><button class="btn wide" onclick="location.reload()">بارگذاری دوباره</button></div>`;
+  }
 }
 function renderNav(){
   const n=alerts().length;
@@ -1049,9 +1057,17 @@ async function initApp(){
   $('#auth-switch').addEventListener('click',()=>setAuthMode(authMode==='signin'?'signup':'signin'));
   $('#auth-password').addEventListener('keydown',e=>{if(e.key==='Enter')submitAuth()});
   $('#auth-email').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auth-password').focus()});
-  const {data,error}=await supabaseClient.auth.getSession();
-  if(error){showAuth('ورود به Supabase ناموفق بود: '+error.message);return}
-  if(data.session?.user)await bootstrapUser(data.session.user);else showAuth();
+  // Show a clear loading state instead of leaving an empty page while auth/network resolves.
+  $('#view').innerHTML='<div class="card empty"><h3>در حال آماده‌سازی انیار…</h3><p>در حال بررسی ورود و دریافت اطلاعات. کمی صبر کن.</p></div>';
+  try{
+    const {data,error}=await withRequestTimeout(supabaseClient.auth.getSession(),15000);
+    if(error)throw error;
+    if(data.session?.user)await withRequestTimeout(bootstrapUser(data.session.user),20000);
+    else showAuth();
+  }catch(err){
+    console.error('Aniar initialization failed:',err);
+    showAuth('اتصال یا بارگذاری اولیه ناموفق بود. اینترنت را بررسی کن و دوباره وارد شو. '+(err.message||''));
+  }
 }
 
 initApp();
