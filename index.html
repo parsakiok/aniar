@@ -1052,7 +1052,7 @@ function applyTheme(theme){
 }
 function toggleTheme(){applyTheme(document.documentElement.classList.contains('light-theme')?'dark':'light')}
 try{applyTheme(localStorage.getItem(THEME_KEY)==='light'?'light':'dark')}catch(e){applyTheme('dark')}
-async function initApp(){
+async async function initApp(){
   load();setAuthMode('signin');
   $('#auth-submit').addEventListener('click',submitAuth);
   $('#auth-switch').addEventListener('click',()=>setAuthMode(authMode==='signin'?'signup':'signin'));
