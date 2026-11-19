@@ -531,7 +531,8 @@ function render(){
     views[S.tab](v);
   }catch(err){
     console.error('Aniar render failed:',err);
-    renderNav();
+    R={};
+    try{renderNav()}catch(navErr){console.error('Aniar navigation render failed:',navErr);$('#nav').innerHTML='<button data-act="tab" data-v="invoice">ثبت خرید</button><button data-act="tab" data-v="history">لیست خرید</button><button data-act="tab" data-v="stock">انبار</button><button data-act="tab" data-v="report">گزارش</button>'}
     v.innerHTML=`<div class="card empty"><h3>نمایش برنامه با خطا روبه‌رو شد</h3><p>اطلاعاتت حذف نشده. صفحه را دوباره بارگذاری کن؛ اگر خطا ادامه داشت، از تنظیمات/بکاپ استفاده کن.</p><button class="btn wide" onclick="location.reload()">بارگذاری دوباره</button></div>`;
   }
 }
@@ -979,7 +980,7 @@ const OWNER_KEY='aniar.owner.v1';
 async function bootstrapUser(user){
   authUser=user;cloudReady=false;
   try{
-    const {data,error}=await supabaseClient.from('aniar_user_data').select('data').eq('user_id',user.id).maybeSingle();
+    const {data,error}=await withRequestTimeout(supabaseClient.from('aniar_user_data').select('data').eq('user_id',user.id).maybeSingle(),15000);
     if(error)throw error;
     const previousOwner=localStorage.getItem(OWNER_KEY);
     if(data&&data.data&&typeof data.data==='object'){
@@ -990,7 +991,7 @@ async function bootstrapUser(user){
       if(previousOwner&&previousOwner!==user.id){
         S.products=[];S.events=[];S.invoices=[];S.draft=newDraft();S.editing=null;
       }
-      const {error:saveError}=await supabaseClient.from('aniar_user_data').upsert({user_id:user.id,data:cloudPayload(),updated_at:new Date().toISOString()},{onConflict:'user_id'});
+      const {error:saveError}=await withRequestTimeout(supabaseClient.from('aniar_user_data').upsert({user_id:user.id,data:cloudPayload(),updated_at:new Date().toISOString()},{onConflict:'user_id'}),15000);
       if(saveError)throw saveError;
     }
     try{localStorage.setItem(OWNER_KEY,user.id)}catch(e){}
